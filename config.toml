@@ -1,0 +1,16 @@
+languageCode = "en-us"
+title = "John Goulah blog"
+theme = "beautifulhugo"
+#theme = "ananke"
+baseURL = "https://example.org/"
+
+[markup]
+  [markup.highlight]
+    codeFences = true
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    style = "monokai"
+    tabWidth = 4

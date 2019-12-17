@@ -21,8 +21,8 @@ There isn&#8217;t much to installing this tool with your favorite package manage
 
 The easiest way to show what pv does is by creating a simple example. We can simply gzip a file and show how much data is being processed and how long it will take to finish. 
 
-<pre>$ pv somefile | gzip > somefile.log.gz
-64.1MB 0:00:03 [10.1MB/s] [==========>                        ] 32% ETA 0:00:06</pre>
+{{< highlight bash >}}$ pv somefile | gzip > somefile.log.gz
+64.1MB 0:00:03 [10.1MB/s] [==========>                        ] 32% ETA 0:00:06{{< /highlight >}}
 
 So here can see we have processed 64.1MB in 3 seconds at a rate of about 10.1MB/s and should take about 6 seconds to finish.
 
@@ -30,10 +30,10 @@ So here can see we have processed 64.1MB in 3 seconds at a rate of about 10.1MB/
 
 Another really cool thing is you can chain these pv commands to see the progress of data being read off the disk and then how fast gzip is compressing it. 
 
-<pre>$ pv -cN source_stream somefile | gzip | pv -cN gzip_stream > somefile.log.gz
+{{< highlight bash >}}$ pv -cN source_stream somefile | gzip | pv -cN gzip_stream > somefile.log.gz
 source_stream: 89.6MB 0:00:06 [10.1MB/s] [============>       ] 45% ETA 0:00:07
 gzip_stream:   14.8MB 0:00:06 [ 3.2MB/s] [       &lt;=>          ]
-</pre>
+{{< /highlight >}}
 
 In this example we created named streams with -N which you can call whatever you want. In this example they are called _source_stream_ and _gzip_stream_ since that&#8217;s what they are measuring. The -c parameter is recommended when running multiple pv processes in the same pipeline and prevents the processes from mangling each others output.
 
@@ -43,15 +43,15 @@ Its important also to point out here that we get a percentage on the source_stre
 
 Another example is using tar to compress a folder, but if we do something like this:
 
-<pre>$ tar cjf - some_directory | pv > out.tar.bz2
-3.55MB 0:00:02 [ 1.2MB/s] [   &lt;=>          ]</pre>
+{{< highlight bash >}}$ tar cjf - some_directory | pv > out.tar.bz2
+3.55MB 0:00:02 [ 1.2MB/s] [   &lt;=>          ]{{< /highlight >}}
 
 the output isn&#8217;t very interesting because pv doesn&#8217;t know the total amount of data its compressing. We can provide the size with the -s option to pv, and a little bash interpretation to grab the size
 
-<pre>tar -cf - some_directory | \
+{{< highlight bash >}}tar -cf - some_directory | \
      pv -s $(du -sb some_directory | awk '{print $1}') | \
      bzip2 > somedir.tar.bz2
-1.39MB 0:00:03 [ 929kB/s] [==>     ]  6% ETA 0:00:45</pre>
+1.39MB 0:00:03 [ 929kB/s] [==>     ]  6% ETA 0:00:45{{< /highlight >}}
 
 So we are telling tar to create an archive of _some_directory_, print the output to stdout, next tell pv the size of that directory using the du command on it, and send that to bzip2 for compression.
 
@@ -59,7 +59,7 @@ So we are telling tar to create an archive of _some_directory_, print the output
 
 At this point the command above gets to be way too much to remember. We&#8217;ve also had to type the directory name twice which is silly. I always put my ~/bin directory in my PATH so that I can throw easy scripts in there. Here&#8217;s one that will take a directory argument and compress it with progress
 
-<pre>#!/bin/sh
+{{< highlight bash >}}#!/bin/sh
 
 if [ -z $1 ]; then
     echo "Usage: $0 dir"
@@ -75,7 +75,7 @@ fi
 
 echo "compressing $dir"
 tar -cf - $dir | pv -s $(du -sb $dir | awk '{print $1}') | bzip2 > $dir.tar.bz2
-</pre>
+{{< /highlight >}}
 
 So we&#8217;ve just taken what we&#8217;ve learned above and created a script that takes an argument, which needs to be a directory (or file) that exists, and the output is that directory name with a tar.bz2 extension.
 
@@ -83,9 +83,9 @@ So we&#8217;ve just taken what we&#8217;ve learned above and created a script th
 
 We can use the same exact concept to chain our tools to get a progress bar on a MySQL data import. Here it is
 
-<pre>pv myschema.sql | \
+{{< highlight bash >}}pv myschema.sql | \
       pv -s $(du -sb myschema.sql | awk '{print $1}') | \
-      mysql -u db_user my_database</pre>
+      mysql -u db_user my_database{{< /highlight >}}
 
 As shown above we can easily turn this into a script that can be reused. 
 

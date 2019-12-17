@@ -27,7 +27,7 @@ It comes up often how to connect to our office <a title="openvpn" href="http://o
 
 Setting up the server is really easy, we can use ssh &#8211; just run this command on your laptop that is connected to your VPN
 
-<pre>ssh -N -D 0.0.0.0:1080 localhost</pre>
+{{< highlight bash >}}ssh -N -D 0.0.0.0:1080 localhost{{< /highlight >}}
 
 If you want it to run in the background also use the -f option. You may also want to setup some access control with <a title="iptables" href="http://en.wikipedia.org/wiki/Iptables" target="_blank">iptables</a>, which is a bit out of scope of this article but more information can be found <a title="socks5" href="http://www.catonmat.net/blog/linux-socks5-proxy" target="_blank">here</a>.
 
@@ -37,10 +37,10 @@ If you want it to run in the background also use the -f option. You may also wan
 
 The only way to configure the iPhone/iPad to use SOCKS is to setup a <a title="PAC" href="http://en.wikipedia.org/wiki/Proxy_auto-config" target="_blank">PAC file</a>. Create a file with the _.pac_ extension, and put this into it:
 
-<pre>function FindProxyForURL(url, host)
+{{< highlight bash >}}function FindProxyForURL(url, host)
 {
 return "SOCKS 192.168.X.XXX";
-}</pre>
+}{{< /highlight >}}
 
 Make sure to use the IP address of your laptop that we setup the SOCKS server on. Now put this file in any web accessible location. It doesn&#8217;t matter if its internal to your network or external, as long as you can access it from the web. How to actually serve a page is beyond the scope of this article, but if you&#8217;ve gotten this far you probably know how to do this.
 

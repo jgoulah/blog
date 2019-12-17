@@ -32,18 +32,18 @@ For this article we&#8217;ll look a common use case of map/reduce which is to he
 
 Mongo is easy to install with <a target="_blank" href="http://www.mongodb.org/display/DOCS/Quickstart">detailed documentation here</a>. In a nutshell you can do
 
-<pre>$ mkdir -p /data/db
+{{< highlight bash >}}$ mkdir -p /data/db
 $ curl -O http://downloads.mongodb.org/osx/mongodb-osx-i386-latest.tgz
 $ tar xzf mongodb-osx-i386-latest.tgz
-</pre>
+{{< /highlight >}}
 
 At this point its not a bad idea to put this directory somewhere like /opt and adding its bin directory to your path. That way instead of 
 
-<pre>./mongodb-xxxxxxx/bin/mongod &</pre>
+{{< highlight bash >}}./mongodb-xxxxxxx/bin/mongod &{{< /highlight >}}
 
 You can just do
 
-<pre>mongodb &</pre>
+{{< highlight bash >}}mongodb &{{< /highlight >}}
 
 In any case, start up the daemon one of those two ways depending how you set it up.
 
@@ -56,7 +56,7 @@ Apache access files can vary in the information reported. The log format is easy
 
 We want to take this raw log and convert it to a JSON structure for importing into mongo, which I wrote a simple perl script to iterate through the log and parse it into sensible fields using a regular expression
 
-<pre>#!/usr/bin/perl
+{{< highlight bash >}}#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -84,7 +84,7 @@ foreach my $logentry (&lt;LOGFH&gt;) {
 JSON
 
 }
-</pre>
+{{< /highlight >}}
 
 Again my regular expression probably won&#8217;t quite work on your logs, though you may be able to take bits and pieces of what I&#8217;ve documented above to use for your script. On my logs that script outputs a bunch of lines that look like this
 
@@ -93,16 +93,16 @@ Again my regular expression probably won&#8217;t quite work on your logs, though
 
 And we can then import that directly to MongoDB. The creates a collection called _weblogs_ in the _logs_ database, from the file that has the output of the above JSON generator script
 
-<pre>$ mongoimport --type json -d logs -c weblogs --file weblogs.json
-</pre>
+{{< highlight bash >}}$ mongoimport --type json -d logs -c weblogs --file weblogs.json
+{{< /highlight >}}
 
 We can also take a look at them and verify they loaded by running the find command, which dumps out 10 rows by default
 
-<pre>$ mongo
+{{< highlight bash >}}$ mongo
 > use logs;
 switched to db logs
 > db.weblogs.find()
-</pre>
+{{< /highlight >}}
 
 ## Setting Up the Map and Reduce Functions
 
@@ -110,21 +110,21 @@ So for this example what I am looking for is how many hits are going to each dom
 
 The basic command line interface to MondoDB is a kind of javascript interpreter, and the mongo backend takes javascript implementations of the map and reduce functions. We can type these directly into the mongo console. The map function must emit a key/value pair and in this example it will output a &#8216;1&#8217; each time a domain is found
 
-<pre>> map = "function() { emit(this.domain_name, {count: 1}); }"
-</pre>
+{{< highlight bash >}}> map = "function() { emit(this.domain_name, {count: 1}); }"
+{{< /highlight >}}
 
 And so basically what comes out of this is a key for each domain with a set of counts, something like
 
-<pre>{"www.something.com", [{count: 1}, {count: 1}, {count: 1}, {count: 1}]}</pre>
+{{< highlight bash >}}{"www.something.com", [{count: 1}, {count: 1}, {count: 1}, {count: 1}]}{{< /highlight >}}
 
 This is send to the reduce function, which sums up all those counts for each domain
 
-<pre>> reduce = "function(key, values) { var sum = 0; values.forEach(function(f) { sum += f.count; }); return {count: sum}; };"
-</pre>
+{{< highlight bash >}}> reduce = "function(key, values) { var sum = 0; values.forEach(function(f) { sum += f.count; }); return {count: sum}; };"
+{{< /highlight >}}
 
 Now that you&#8217;ve setup map and reduce functions, you can call mapreduce on the collection
 
-<pre>> results = db.weblogs.mapReduce(map, reduce)
+{{< highlight bash >}}> results = db.weblogs.mapReduce(map, reduce)
 ...
 >results
 {
@@ -137,22 +137,22 @@ Now that you&#8217;ve setup map and reduce functions, you can call mapreduce on 
         },
         "ok" : 1,
 }
-</pre>
+{{< /highlight >}}
 
 This gives us a bit of information about the map/reduce operation itself. We see that we inputted a set of data and emmitted once per item in that set. And we reduced down to 92 domain with a count for each. A result collection is given, and we can print it out
 
-<pre>> db.tmp.mr.mapreduce_1263861252_3.find()
+{{< highlight bash >}}> db.tmp.mr.mapreduce_1263861252_3.find()
 > it
-</pre>
+{{< /highlight >}}
 
 You can type the &#8216;it&#8217; operator to page through multiple pages of data. Or you can print it all at once like so
 
-<pre>> db.tmp.mr.mapreduce_1263861252_3.find().forEach( function(x) { print(tojson(x));});
+{{< highlight bash >}}> db.tmp.mr.mapreduce_1263861252_3.find().forEach( function(x) { print(tojson(x));});
 { "_id" : "barelydigital.com", "value" : { "count" : 342888 } }
 { "_id" : "barelypolitical.com", "value" : { "count" : 875217 } }
 { "_id" : "www.fastlanedaily.com", "value" : { "count" : 998360 } }
 { "_id" : "www.threadbanger.com", "value" : { "count" : 331937 } }
-</pre>
+{{< /highlight >}}
 
 Nice, we have our data aggregated and the answer to our initial problem.
 
@@ -160,7 +160,7 @@ Nice, we have our data aggregated and the answer to our initial problem.
 
 As usual CPAN comes to the rescue with a <a target="_blank" href="http://search.cpan.org/~kristina/MongoDB-0.27/">MongoDB driver</a> that we can use to interface with our database in a scripted fashion. The mongo guys have also done a great job of supporting it in a <a target="_blank" href="http://www.mongodb.org/display/DOCS/Drivers">bunch of other languages</a> which makes it easy to interface with if you are using more than just perl
 
-<pre>#!/bin/perl
+{{< highlight bash >}}#!/bin/perl
 
 use MongoDB;
 use Data::Dumper;
@@ -189,7 +189,7 @@ my $cursor = $collection->query({ }, { limit => 10 });
 while (my $object = $cursor->next) {
     print Dumper($object); 
 }
-</pre>
+{{< /highlight >}}
 
 The script is straightforward. Its just using the documented perl interface to make a run_command call to mongo, which passes the map and reduce javascript functions in. It then prints the results similar to how we did on the command line earlier.
 

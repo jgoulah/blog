@@ -24,11 +24,11 @@ There are a lot of private <a href="http://www.openstack.org/" title="openstack"
 
 We can use <a href="http://libvirt.org/" title="libvirt" target="_blank">libvirt</a> and <a href="http://wiki.qemu.org/KVM" title="kvm-qemu" target="_blank">KVM/QEMU</a> to put something reasonably robust together, start by installing those packages:
 
-<pre>apt-get install qemu-kvm libvirt libvirt-bin virtinst virt-viewer</pre>
+{{< highlight bash >}}apt-get install qemu-kvm libvirt libvirt-bin virtinst virt-viewer{{< /highlight >}}
 
 The next important thing is to setup a <a href="http://wiki.debian.org/BridgeNetworkConnections#Libvirt_and_bridging" title="libvirt and bridging" target="_blank">bridge</a> for proper networking on this host. This will allow the guests to use the bridge to communicate on the same network. There should be a few articles <a href="http://wiki.libvirt.org/page/Networking#Altering_the_interface_config" target="_blank">out there</a> that can help you set this up, but the basics are that you want your bridge assigned the IP that your eth0 interface previously had, and then add the eth0 interface to the bridge. In this example _192.168.1.101_ is the IP of the host machine:
 
-<pre># cat /etc/network/interfaces
+{{< highlight bash >}}# cat /etc/network/interfaces
 auto lo
 iface lo inet loopback
 
@@ -43,23 +43,23 @@ iface br0 inet static
   bridge_ports eth0
   
 ifup br0
-</pre>
+{{< /highlight >}}
 
 ## Building the Image
 
 The first step is setting up a base template that you create your instances from. So grab an iso to start from, we&#8217;ll use debian, but this process works with any distro:
 
-<pre>% wget http://cdimage.debian.org/debian-cd/6.0.6/amd64/iso-cd/debian-6.0.6-amd64-netinst.iso</pre>
+{{< highlight bash >}}% wget http://cdimage.debian.org/debian-cd/6.0.6/amd64/iso-cd/debian-6.0.6-amd64-netinst.iso{{< /highlight >}}
 
 And allocate a file on disk to the size you&#8217;d like your template to be. I created one here at 8GB, it can always be expanded later, so this should only need to be big enough to hold the initial base image that all instances will start from. Generally smaller is better because of the copy step when instances get created later. 
 
-<pre>% dd if=/dev/zero of=/var/lib/libvirt/images/debbase.img bs=1M count=8192</pre>
+{{< highlight bash >}}% dd if=/dev/zero of=/var/lib/libvirt/images/debbase.img bs=1M count=8192{{< /highlight >}}
 
 Now you can start the linux installation, noting the _&#8211;graphics_ args for the ability to connect with VNC. Our installation target disk is the one we created above, _debbase.img_, and we are giving it 512M RAM and 1 CPU. 
 
-<pre>% virt-install --name=virt-base-deb --ram=512 --graphics vnc,listen=0.0.0.0  --network=bridge=br0 \
+{{< highlight bash >}}% virt-install --name=virt-base-deb --ram=512 --graphics vnc,listen=0.0.0.0  --network=bridge=br0 \
 --accelerate --virt-type=kvm --vcpus=1 --cpuset=auto --cpu=host --disk /var/lib/libvirt/images/debbase.img \
---cdrom debian-6.0.6-amd64-netinst.iso</pre>
+--cdrom debian-6.0.6-amd64-netinst.iso{{< /highlight >}}
 
 Once thats started up you can use VNC on your client machine to connect to this instance graphically and run through the normal install setup. There are <a href="http://en.wikipedia.org/wiki/Virtual_Network_Computing#See_also" title="vnc clients" target="_blank">plenty of clients</a> out there but a decent one is <a href="http://sourceforge.net/projects/cotvnc/" title="chicken of the vnc" target="_blank">Chicken of the VNC</a>. Its also possible at this step that you&#8217;d create the image off a [PXE boot][1] or similar bootstrapping mechanism.
 
@@ -69,13 +69,13 @@ Here we take advantage of QEMU ability to load Linux kernels and init ramdisks d
 
 There are two steps to make this work. First you&#8217;ll need the vmlinuz and initrd files, and the easiest way to get those is to copy them from the base image we setup above:
 
-<pre>% scp BASEIP:/boot/vmlinuz-2.6.32-5-amd64 /var/lib/libvirt/kernels/
+{{< highlight bash >}}% scp BASEIP:/boot/vmlinuz-2.6.32-5-amd64 /var/lib/libvirt/kernels/
 % scp BASEIP:/boot/initrd.img-2.6.32-5-amd64 /var/lib/libvirt/kernels/
-</pre>
+{{< /highlight >}}
 
 The next step is to extract the root partition from that same base image. We want to take a look at how those partitions are laid out so that we can get the right numbers to pass to the <a href="http://en.wikipedia.org/wiki/Dd_(Unix)" title="dd" target="_blank">dd</a> command. 
 
-<pre>% sfdisk -l -uS /var/lib/libvirt/images/debbase.img
+{{< highlight bash >}}% sfdisk -l -uS /var/lib/libvirt/images/debbase.img
 
 Disk /var/lib/libvirt/images/debbase.img: 1044 cylinders, 255 heads, 63 sectors/track
 Warning: extended partition does not start at a cylinder boundary.
@@ -88,41 +88,41 @@ Units = sectors of 512 bytes, counting from 0
 /var/lib/libvirt/images/debbase.img3             0         -          0   0  Empty
 /var/lib/libvirt/images/debbase.img4             0         -          0   0  Empty
 /var/lib/libvirt/images/debbase.img5      15990784  16775167     784384  82  Linux swap / Solaris
-</pre>
+{{< /highlight >}}
 
 We are going to pull the first partition out, note how the numbers line up to the first line corresponding to _debbase.img1_ line. We start at sector 2048 and get 15986688 sectors of 512 bytes each:
 
-<pre>% dd if=/var/lib/libvirt/images/debbase.img of=/var/lib/libvirt/debian-tmpl skip=2048 count=15986688 bs=512</pre>
+{{< highlight bash >}}% dd if=/var/lib/libvirt/images/debbase.img of=/var/lib/libvirt/debian-tmpl skip=2048 count=15986688 bs=512{{< /highlight >}}
 
 #### Templatize the Image
 
 Now we have a disk file that serves as our image template. There&#8217;s a few things we want to change directly on this template. Note that we are using a few all caps placeholders ending in _-TMPL_ that we&#8217;ll replace later with sed. We can edit the templates files by mounting the disk:
 
-<pre>% mkdir -p /tmp/newtmpl
+{{< highlight bash >}}% mkdir -p /tmp/newtmpl
 % mount -t ext3 -o loop /var/lib/libvirt/debian-tmpl /tmp/newtmpl
 % chroot /tmp/newtmpl
-</pre>
+{{< /highlight >}}
 
 Note at this point we are <a href="http://en.wikipedia.org/wiki/Chroot" title="chroot" target="_blank">chrooted</a> and these commands are acting against our template disk file. 
 
 Clear out the old IPs tied to our NIC when the base image networking was setup:
 
-<pre>% echo "" > /etc/udev/rules.d/70-persistent-net.rules
-</pre>
+{{< highlight bash >}}% echo "" > /etc/udev/rules.d/70-persistent-net.rules
+{{< /highlight >}}
 
 We&#8217;re going to put a placeholder for our hostname in _/etc/hostname_:
 
-<pre>% echo "HOSTNAME-TMPL" > /etc/hostname
-</pre>
+{{< highlight bash >}}% echo "HOSTNAME-TMPL" > /etc/hostname
+{{< /highlight >}}
 
 Set a nameserver template in _/etc/resolv.conf_:
 
-<pre>% echo "nameserver NAMESERVER-TMPL" > /etc/resolv.conf 
-</pre>
+{{< highlight bash >}}% echo "nameserver NAMESERVER-TMPL" > /etc/resolv.conf 
+{{< /highlight >}}
 
 In the file _/etc/network/interfaces_:
 
-<pre># The loopback network interface
+{{< highlight bash >}}# The loopback network interface
 auto lo
 iface lo inet loopback
 
@@ -131,18 +131,18 @@ iface eth0 inet static
 address ADDRESS-TMPL
 netmask NETMASK-TMPL
 gateway GATEWAY-TMPL
-</pre>
+{{< /highlight >}}
 
 This will give us console access when we boot it. Make sure _/etc/inittab_ has this line (usually just uncomment it):
 
-<pre>T0:23:respawn:/sbin/getty -L ttyS0 9600 vt100
-</pre>
+{{< highlight bash >}}T0:23:respawn:/sbin/getty -L ttyS0 9600 vt100
+{{< /highlight >}}
 
 ## Creating an Instance
 
 Now we have all the pieces together to launch an instance from our image. This script will create the instance given the IP and hostname. It does no error checking for readability reasons, and is well commented so that you know whats going on:
 
-<pre>#!/bin/bash
+{{< highlight bash >}}#!/bin/bash
 
 # read in '&lt;ip> &lt;host>' from command line
 virt_ip=$1
@@ -207,12 +207,12 @@ _ip=${virt_ip} _hostname=${virt_fqdn} _gateway=${virt_gateway} _dns1=${virt_name
 
 # start it up
 virsh start $virt_host
-</pre>
+{{< /highlight >}}
 
 assuming we named it _buildserver_, run the above like:
 
-<pre>% buildserver 192.168.1.197 jgoulah
-</pre>
+{{< highlight bash >}}% buildserver 192.168.1.197 jgoulah
+{{< /highlight >}}
 
 ## Conclusion
 

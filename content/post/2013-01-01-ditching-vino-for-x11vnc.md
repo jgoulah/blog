@@ -27,24 +27,24 @@ First thing is to install it:
 
 Setup a password file:
 
-<pre>sudo x11vnc -storepasswd YOUR_PASS_HERE /etc/x11vnc.pass</pre>
+{{< highlight bash >}}sudo x11vnc -storepasswd YOUR_PASS_HERE /etc/x11vnc.pass{{< /highlight >}}
 
 Create an upstart config:
 
-<pre>sudo touch /etc/init/x11vnc.conf</pre>
+{{< highlight bash >}}sudo touch /etc/init/x11vnc.conf{{< /highlight >}}
 
 Open it and put this into it:
 
-<pre>start on login-session-start
+{{< highlight bash >}}start on login-session-start
 script
 x11vnc -xkb -noxrecord -noxfixes -noxdamage -display :0 -rfbauth /etc/x11vnc.pass \
  -auth /var/run/lightdm/root/:0 -forever -bg -o /var/log/x11vnc.log
 end script
-</pre>
+{{< /highlight >}}
 
 and start it up:
 
-<pre>sudo service x11vnc start</pre>
+{{< highlight bash >}}sudo service x11vnc start{{< /highlight >}}
 
 Simple, easy, and just works. 
 

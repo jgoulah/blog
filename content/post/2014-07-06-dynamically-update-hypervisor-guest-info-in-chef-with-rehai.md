@@ -32,7 +32,7 @@ It was supposed to be released a while ago, but has taken some time for various 
 
 If you&#8217;re interested in this tool, you can install it with ruby gems using the command:
 
-<pre>% gem install rehai
-</pre>
+{{< highlight bash >}}% gem install rehai
+{{< /highlight >}}
 
 If you&#8217;d like to see the source, head on over to <a href="https://github.com/jgoulah/rehai" target="_blank">github</a>.

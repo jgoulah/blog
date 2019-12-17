@@ -29,9 +29,9 @@ When you run _go build_ it produces a binary executable that can easily be shipp
 
 Typically when doing production deployments there exists a build server where the application is compiled and the pieces are put in place for shipping to production. Certainly no production facing app should be getting deployed from a developers virtual machine, but the process for building the app should be identical. Building a go app is fairly straightforward but it can be a good idea to organize your steps and common commands in a Makefile. We&#8217;ll build our binary into the _bin_ subdirectory: 
 
-<pre>build:
+{{< highlight bash >}}build:
         go build -o ./bin/myapp myapp.go
-</pre>
+{{< /highlight >}}
 
 This produces the binary that we&#8217;ll eventually ship.
 
@@ -41,25 +41,25 @@ This build process works fine in development but how do we know the external dep
 
 Assuming you have a proper go toolchain setup, you can get started with godep by getting it and running a single command:
 
-<pre>go get github.com/tools/godep
+{{< highlight bash >}}go get github.com/tools/godep
 # then in your project dir
 godep save -r ./...
-</pre>
+{{< /highlight >}}
 
 This should pull all of your dependencies into a Godeps directory as well as update your files to import this &#8220;frozen&#8221; copy of the dependencies you are using. 
 
 Since we won&#8217;t want to stay locked on old versions of software, we need a way to update our projects dependencies from time to time. This is something you&#8217;d probably want to add to your Makefile:
 
-<pre>updep:
+{{< highlight bash >}}updep:
         go get -u -v -d $(import)
         godep update $(import)
         godep save -r ./...
-</pre>
+{{< /highlight >}}
 
 Using this command we can update any of our dependencies like so:
 
-<pre>make updep import=github.com/codahale/metrics
-</pre>
+{{< highlight bash >}}make updep import=github.com/codahale/metrics
+{{< /highlight >}}
 
 ### Configuration
 
@@ -80,17 +80,17 @@ So now we have a way to deal with our dependencies and the build. We know how to
 At this point there are only a few steps that need to happen on a deploy box:
 
   * Get the newest code
-<pre>git fetch && git reset --hard</pre>
+{{< highlight bash >}}git fetch && git reset --hard{{< /highlight >}}
 
   * Build the binary
-<pre>cd $basedir && make build</pre>
+{{< highlight bash >}}cd $basedir && make build{{< /highlight >}}
 
   * Rsync the code
-<pre>rsync -va --delete --force \
+{{< highlight bash >}}rsync -va --delete --force \
 --include='static' --include='bin' --include='config*.cfg' --include='*/*' --exclude='*' \
-deploy.mydomain.com:/var/myorg/build/golang/src/github.mydomain.com/jgoulah/myapp/ /usr/myorg/myapp</pre>
+deploy.mydomain.com:/var/myorg/build/golang/src/github.mydomain.com/jgoulah/myapp/ /usr/myorg/myapp{{< /highlight >}}
 
   * Use your init script to restart the app, depending on the system
-<pre>/etc/init.d/myapp restart</pre>
+{{< highlight bash >}}/etc/init.d/myapp restart{{< /highlight >}}
 
 In this example the rsync command is run on an application box and pulling from our deploy host. In a large deploy we may dsh out to many app hosts to rsync our build over in a pull based fashion. The _/var/myorg/build_ directory is where our make build command was run to produce our binaries. We sync the bin directory that contains the binaries, the static directory which has our html/js/css, and the config files. Lastly we restart our app. These steps can be coded into a Deployinator stack or with the deploy tool of your choice. But regardless of the tool we use, we will have a repeatable and dependable process with reliable dependencies that we can ship.

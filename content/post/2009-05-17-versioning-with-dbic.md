@@ -25,13 +25,13 @@ It&#8217;s possible to produce your schema classes with <a title="schema loader"
 
 This example will be a pretty simple schema but enough to demonstrate generating a couple of tables with a foreign key constraint. Since a lot of people are doing social networking stuff these days we can assume a common use case would be a user who has a bunch of photos. So we&#8217;ll need to model a user table and a photo table, but first things first, lets create a few basic things, assuming we&#8217;ll call our application MySocialApp
 
-<pre>mkdir -p MySocialApp/lib/MySocialApp/Schema/Result
+{{< highlight bash >}}mkdir -p MySocialApp/lib/MySocialApp/Schema/Result
 cd MySocialApp
-</pre>
+{{< /highlight >}}
 
 We need to create a schema file at _lib/MySocialApp/Schema.pm_ that inherits from the base <a href="http://search.cpan.org/~ribasushi/DBIx-Class-0.08102/lib/DBIx/Class/Schema.pm" target="_blank">DBIx::Class::Schema</a>
 
-<pre>package MySocialApp::Schema;
+{{< highlight bash >}}package MySocialApp::Schema;
 use base qw/DBIx::Class::Schema/;
 
 use strict;
@@ -45,7 +45,7 @@ __PACKAGE__->load_components(qw/Schema::Versioned/);
 __PACKAGE__->upgrade_directory('sql/');
 
 1;
-</pre>
+{{< /highlight >}}
 
 So here all we are doing is extending the base Schema and loading the <a href="http://search.cpan.org/~ribasushi/DBIx-Class-0.08102/lib/DBIx/Class/Schema/Versioned.pm" target="_blank">Versioned</a> component. We&#8217;re setting the directory where DDL and Diff files will be generated into the _sql_ directory. We&#8217;re also invoking <a href="http://search.cpan.org/~ribasushi/DBIx-Class-0.08102/lib/DBIx/Class/Schema.pm#load_namespaces" target="_blank" >load_namespaces</a> which tells it to look at the MySocialApp::Schema::Result namespace for our result classes by default.
 
@@ -53,7 +53,7 @@ So here all we are doing is extending the base Schema and loading the <a href="h
 
 Here I will define what the database is going to look like
 
-<pre>package MySocialApp::Schema::Result::User;
+{{< highlight bash >}}package MySocialApp::Schema::Result::User;
 
 use Moose;
 use namespace::clean -except => 'meta';
@@ -88,11 +88,11 @@ __PACKAGE__->has_many(
 );
 
 1;
-</pre>
+{{< /highlight >}}
 
 This is relatively straightforward. I&#8217;m creating a user table that has an auto incrementing primary key and a username field. I&#8217;m also defining a <a href="http://search.cpan.org/~ribasushi/DBIx-Class-0.08102/lib/DBIx/Class/Relationship.pm" target="_blank">relationship</a> that says a user can have many photos. Lets create the photo class.
 
-<pre>package MySocialApp::Schema::Result::Photo;
+{{< highlight bash >}}package MySocialApp::Schema::Result::Photo;
 
 use Moose;
 use namespace::clean -except => 'meta';
@@ -134,7 +134,7 @@ __PACKAGE__->set_primary_key('photo_id');
 
 
 1;
-</pre>
+{{< /highlight >}}
 
 Same basic thing here, a photo class with a photo\_id primary key, a url field, and an fk\_user_id field that keys into the user table. Each photo belongs to a user, and this relationship will define our foreign key constraint when the schema is generated. 
 
@@ -146,7 +146,7 @@ We have the main DBIx::Class pieces in place to generate the database, but we&#8
 
 First the schema and diff generation script which we&#8217;ll call _script/gen_schema.pl_
 
-<pre>use strict;
+{{< highlight bash >}}use strict;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -175,13 +175,13 @@ if ($version && $preversion) {
 
 my $sql_dir = './sql';
 $schema->create_ddl_dir( 'MySQL', $version, $sql_dir, $preversion );
-</pre>
+{{< /highlight >}}
 
 This script will be run anytime we change something in the Result files. You give it the previous schema version, and it will create a diff between that and the new version. Before running this you&#8217;ll update the $VERSION variable in lib/MySocialApp/Schema.pm so that it knows a change has been made.
 
 The next script is the upgrade script, we&#8217;ll call it _script/upgrade_db.pl_
 
-<pre>use strict;
+{{< highlight bash >}}use strict;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -198,7 +198,7 @@ if (!$schema->get_db_version()) {
 } else {
     $schema->upgrade();
 }
-</pre>
+{{< /highlight >}}
 
 This script checks to see if any diffs need to be applied, and applies them if the version held by the database and the version in your Schema.pm file differ, bringing the database up to the correct schema version.
 
@@ -208,38 +208,38 @@ Note, in these scripts I&#8217;ve hardcoded the DB info which really should go i
 
 We need to create the database that our tables will be created in. In the connect calls above we&#8217;re using this user and password to connect to our database. I&#8217;m using MySQL for the example so this would be done on the MySQL command prompt
 
-<pre>mysql> create database mysocialapp;
+{{< highlight bash >}}mysql> create database mysocialapp;
 Query OK, 1 row affected (0.00 sec)
 
 mysql> grant all on mysocialapp.* to mysocialapp@'localhost' identified by 'mysocialapp4u';
 Query OK, 0 rows affected (0.01 sec)
-</pre>
+{{< /highlight >}}
 
 ## Deploy the Initial Schema
 
 Now its time to deploy our initial schema into MySQL. But for the first go round we also have to create the initial DDL file, this way when we make changes in the future it can be compared against the Schema result classes to see what changes have been made. We can do this by supplying a nonexistent previous version to our gen_schema.pl script
 
-<pre>$ perl script/gen_schema.pl -p 0.00000
+{{< highlight bash >}}$ perl script/gen_schema.pl -p 0.00000
 Your DB is currently unversioned. Please call upgrade on your schema to sync the DB.
 creating diff between version 0.00001 and 0.00000
 No previous schema file found (sql/MySocialApp-Schema-0.00000-MySQL.sql) at /home/jgoulah/perl5/lib/perl5/DBIx/Class/Storage/DBI.pm line 1685.
-</pre>
+{{< /highlight >}}
 
 And we can see the DDL file now exists
 
-<pre>$ ls sql/
+{{< highlight bash >}}$ ls sql/
 MySocialApp-Schema-0.00001-MySQL.sql
-</pre>
+{{< /highlight >}}
 
 Then we need to deploy to MySQL for the first time so we run the upgrade script
 
-<pre>$ perl script/upgrade_db.pl
+{{< highlight bash >}}$ perl script/upgrade_db.pl
 Your DB is currently unversioned. Please call upgrade on your schema to sync the DB.
-</pre>
+{{< /highlight >}}
 
 Now check out what its created in MySQL
 
-<pre>mysql> use mysocialapp;
+{{< highlight bash >}}mysql> use mysocialapp;
 Database changed
 mysql> show tables;
 +----------------------------+
@@ -251,22 +251,22 @@ mysql> show tables;
 +----------------------------+
 3 rows in set (0.00 sec)
 
-</pre>
+{{< /highlight >}}
 
 There is our photo table, our user table, and also a dbix\_class\_schema_versions table. This last table just keeps track of what version the database is. You can see we are in sync with the Schema class by selecting from that table and also when this version was installed.
 
-<pre>mysql> select * from dbix_class_schema_versions;
+{{< highlight bash >}}mysql> select * from dbix_class_schema_versions;
 +---------+---------------------+
 | version | installed           |
 +---------+---------------------+
 | 0.00001 | 2009-05-17 21:59:57 |
 +---------+---------------------+
 1 row in set (0.00 sec)
-</pre>
+{{< /highlight >}}
 
 The really great thing is that we have created the tables -and- constraints based on our schema result classes. Check out our photo table
 
-<pre>mysql> show create table photo\G
+{{< highlight bash >}}mysql> show create table photo\G
 *************************** 1. row ***************************
        Table: photo
 Create Table: CREATE TABLE `photo` (
@@ -278,13 +278,13 @@ Create Table: CREATE TABLE `photo` (
   CONSTRAINT `photo_fk_fk_user_id` FOREIGN KEY (`fk_user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 1 row in set (0.00 sec)
-</pre>
+{{< /highlight >}}
 
 # Making Database Changes
 
 Lets say we want to add a password field to our user table. I&#8217;d open up the _lib/MySocialApp/Schema/Result/User.pm_ file and add a section for my password field to the add_columns definition so now it looks like:
 
-<pre>__PACKAGE__->add_columns(
+{{< highlight bash >}}__PACKAGE__->add_columns(
 
     user_id => {
         data_type   => "INT",
@@ -304,22 +304,22 @@ Lets say we want to add a password field to our user table. I&#8217;d open up th
         size => 255,
     },
 );
-</pre>
+{{< /highlight >}}
 
 Then we update the _lib/MySocialApp/Schema.pm_ file and update to the next version so it looks like
 
-<pre>our $VERSION = '0.00002';</pre>
+{{< highlight bash >}}our $VERSION = '0.00002';{{< /highlight >}}
 
 To create the DDL and Diff for this version we run the gen_schema script with the _previous_ version as the argument
 
-<pre>$ perl script/gen_schema.pl -p 0.00001
+{{< highlight bash >}}$ perl script/gen_schema.pl -p 0.00001
 Versions out of sync. This is 0.00002, your database contains version 0.00001, please call upgrade on your Schema.
 creating diff between version 0.00002 and 0.00001
-</pre>
+{{< /highlight >}}
 
 If you look in the sql directory there are two new files. The DDL is named _MySocialApp-Schema-0.00002-MySQL.sql_ and the diff is called _MySocialApp-Schema-0.00001-0.00002-MySQL.sql_ and has the alter statement
 
-<pre>$ cat sql/MySocialApp-Schema-0.00001-0.00002-MySQL.sql
+{{< highlight bash >}}$ cat sql/MySocialApp-Schema-0.00001-0.00002-MySQL.sql
 -- Convert schema 'sql/MySocialApp-Schema-0.00001-MySQL.sql' to 'MySocialApp::Schema v0.00002':;
 
 BEGIN;
@@ -327,19 +327,19 @@ BEGIN;
 ALTER TABLE user ADD COLUMN password VARCHAR(255) NOT NULL;
 
 COMMIT;
-</pre>
+{{< /highlight >}}
 
 Now we can apply that with our upgrade script
 
-<pre>$ perl script/upgrade_db.pl
+{{< highlight bash >}}$ perl script/upgrade_db.pl
 Versions out of sync. This is 0.00002, your database contains version 0.00001, please call upgrade on your Schema.
 
 DB version (0.00001) is lower than the schema version (0.00002). Attempting upgrade.
-</pre>
+{{< /highlight >}}
 
 and see that the upgrade has been made in MySQL
 
-<pre>mysql> describe user;
+{{< highlight bash >}}mysql> describe user;
 +----------+------------------+------+-----+---------+----------------+
 | Field    | Type             | Null | Key | Default | Extra          |
 +----------+------------------+------+-----+---------+----------------+
@@ -348,7 +348,7 @@ and see that the upgrade has been made in MySQL
 | password | varchar(255)     | NO   |     |         |                |
 +----------+------------------+------+-----+---------+----------------+
 3 rows in set (0.00 sec)
-</pre>
+{{< /highlight >}}
 
 # Conclusion
 

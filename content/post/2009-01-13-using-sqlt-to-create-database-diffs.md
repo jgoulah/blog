@@ -52,7 +52,7 @@ The above may be all you need, but perhaps you want to diff a DDL against the ac
 
 SQLT doesn&#8217;t currently have any scripts to handle this (yet) so we&#8217;ll have to use the perl module itself to do what we want. A simple perl script is all we need.
 
-<pre>#!/usr/bin/perl
+{{< highlight bash >}}#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -105,7 +105,7 @@ if(!open($file, ">$filename")) {
   next;
 }
 print $file $diff;
-</pre>
+{{< /highlight >}}
 
 So we&#8217;ve used the SQL Translator tool to read in our database, read in our DDL, and produce a diff. Pretty neat!
 

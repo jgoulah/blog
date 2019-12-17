@@ -26,61 +26,61 @@ Compiling a [kernel][1] is actually a fairly easy thing to do these days. I&#821
 
 You can always find the kernel at kernel.ftp.org. Login as _anonymous_ and with your email address as the password:
 
-<pre>$ ftp ftp.kernel.org
+{{< highlight bash >}}$ ftp ftp.kernel.org
 Connected to pub.us.kernel.org.
 220 Welcome to ftp.kernel.org.
 Name (ftp.kernel.org:jgoulah): anonymous
 331 Please specify the password. {email address}
 Password: 
-</pre>
+{{< /highlight >}}
 
 Change directories into the 2.6.x series
 
-<pre>ftp> cd pub/linux/kernel/v2.6</pre>
+{{< highlight bash >}}ftp> cd pub/linux/kernel/v2.6{{< /highlight >}}
 
 We want linux-2.6.28.tar.bz2, which is the newest at the time of this article
 
-<pre>ftp> binary
+{{< highlight bash >}}ftp> binary
 200 Switching to Binary mode.
 ftp> get linux-2.6.28.tar.bz2
-ftp> exit</pre>
+ftp> exit{{< /highlight >}}
 
 Now you have the kernel.
 
 You may also need these tools depending what you&#8217;ve installed so far
 
-<pre>apt-get install kernel-package libncurses5-dev fakeroot wget bzip2 build-essential</pre>
+{{< highlight bash >}}apt-get install kernel-package libncurses5-dev fakeroot wget bzip2 build-essential{{< /highlight >}}
 
 # Extract and Configure the Source
 
 We&#8217;ll put the tarball into _/usr/src_
 
-<pre>$ sudo mv linux-2.6.28.tar.bz2 /usr/src/</pre>
+{{< highlight bash >}}$ sudo mv linux-2.6.28.tar.bz2 /usr/src/{{< /highlight >}}
 
 Extract it
 
-<pre>$ cd /usr/src
-$ sudo tar xjf linux-2.6.28.tar.bz2</pre>
+{{< highlight bash >}}$ cd /usr/src
+$ sudo tar xjf linux-2.6.28.tar.bz2{{< /highlight >}}
 
 Its good measure to point a symlink to your current kernel
 
-<pre>$ sudo ln -s linux-2.6.28 linux</pre>
+{{< highlight bash >}}$ sudo ln -s linux-2.6.28 linux{{< /highlight >}}
 
 And change into the directory
 
-<pre>cd /usr/src/linux</pre>
+{{< highlight bash >}}cd /usr/src/linux{{< /highlight >}}
 
 If you have any patches, now is the time to install them
 
-<pre>bzip2 -dc /usr/src/patch.bz2 | patch -p1</pre>
+{{< highlight bash >}}bzip2 -dc /usr/src/patch.bz2 | patch -p1{{< /highlight >}}
 
 Clean things up
 
-<pre>make clean && make mrproper</pre>
+{{< highlight bash >}}make clean && make mrproper{{< /highlight >}}
 
 Now we can finally configure the kernel. Its a really smart idea to copy your existing configuration into the current kernel as a starting point. You certainly don&#8217;t want to lose any of your current modules. 
 
-<pre>$ sudo cp /boot/config-`uname -r` .config</pre>
+{{< highlight bash >}}$ sudo cp /boot/config-`uname -r` .config{{< /highlight >}}
 
 There is one more step to load in your old settings
 
@@ -92,18 +92,18 @@ Enter your config file _.config_ when it prompts you
 
 When you exit out make sure to save and then you can do a diff against your old config and see the new kernel options:
 
-<pre>$ diff /boot/config-`uname -r` .config</pre>
+{{< highlight bash >}}$ diff /boot/config-`uname -r` .config{{< /highlight >}}
 
 You can go back into menuconfig to make any changes necessarily, which is typically some new module you&#8217;d like to try out. For this kernel version I&#8217;m at least enabling [ext4][3] and [minstrel][4].
 
 # Compiling the Kernel
 
-<pre>$ sudo make-kpkg clean</pre>
+{{< highlight bash >}}$ sudo make-kpkg clean{{< /highlight >}}
 
 On this command you will want to set the string that gets appended to the version in the new kernel name. I usually just do something like -custom-buildX where X is the number of times I&#8217;ve changed configurations on this kernel version and rebuilt it. You can name it whatever you like as long as it begins with a minus (-) and doesn&#8217;t contain spaces
 
-<pre>$ sudo fakeroot make-kpkg --initrd \ 
---append-to-version=-custom-build1 kernel_image kernel_headers</pre>
+{{< highlight bash >}}$ sudo fakeroot make-kpkg --initrd \ 
+--append-to-version=-custom-build1 kernel_image kernel_headers{{< /highlight >}}
 
 Go get a sandwich or something, depending on your computer this can take a while.
 
@@ -111,12 +111,12 @@ Go get a sandwich or something, depending on your computer this can take a while
 
 The cool part about this is we&#8217;ve just created two .deb files that can be installed on other Debian servers, no re-compilation necessary. The files will look something like this, given the above parameter to the _append-to-verson_ option from above
 
-<pre>linux-headers-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
-linux-image-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb</pre>
+{{< highlight bash >}}linux-headers-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
+linux-image-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb{{< /highlight >}}
 
 So install them like a regular Debian package
 
-<pre>$ sudo dpkg -i linux-image-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
+{{< highlight bash >}}$ sudo dpkg -i linux-image-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
 Selecting previously deselected package linux-image-2.6.28-custom-build1.
 (Reading database ... 418301 files and directories currently installed.)
 Unpacking linux-image-2.6.28-custom-build1 (from linux-image-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb) ...
@@ -155,35 +155,35 @@ Found kernel: /boot/vmlinuz-2.6.24.4-custom3
 Found kernel: /boot/vmlinuz-2.6.24.4-custom2
 Found kernel: /boot/vmlinuz-2.6.24.4-custom
 Found kernel: /boot/vmlinuz-2.6.18-6-686
-Updating /boot/grub/menu.lst ... done</pre>
+Updating /boot/grub/menu.lst ... done{{< /highlight >}}
 
 And the kernel headers
 
-<pre>$ sudo dpkg -i linux-headers-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
+{{< highlight bash >}}$ sudo dpkg -i linux-headers-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb
 Selecting previously deselected package linux-headers-2.6.28-custom-build1.
 (Reading database ... 418509 files and directories currently installed.)
 Unpacking linux-headers-2.6.28-custom-build1 (from linux-headers-2.6.28-custom-build1_2.6.28-custom-build1-10.00.Custom_i386.deb) ...
-Setting up linux-headers-2.6.28-custom-build1 (2.6.28-custom-build1-10.00.Custom) ...</pre>
+Setting up linux-headers-2.6.28-custom-build1 (2.6.28-custom-build1-10.00.Custom) ...{{< /highlight >}}
 
 That&#8217;s pretty much it. You can look at your grub config
 
-<pre>$ vim /boot/grub/menu.lst</pre>
+{{< highlight bash >}}$ vim /boot/grub/menu.lst{{< /highlight >}}
 
 Scroll down and you&#8217;ll see an entry for your new kernel. The topmost entry is the default, but remember you can also choose a different kernel at boot
 
-<pre>title       Debian GNU/Linux, kernel 2.6.28-custom-build1
+{{< highlight bash >}}title       Debian GNU/Linux, kernel 2.6.28-custom-build1
 root        (hd1,0)
 kernel      /boot/vmlinuz-2.6.28-custom-build1 root=/dev/sdb1 ro
 initrd      /boot/initrd.img-2.6.28-custom-build1
-savedefault</pre>
+savedefault{{< /highlight >}}
 
 You can see the correct files installed into _/boot_
 
-<pre>$ ls -al /boot/*2.6.28*
+{{< highlight bash >}}$ ls -al /boot/*2.6.28*
 -rw-r--r-- 1 root root   63928 2009-01-28 23:56 /boot/config-2.6.28-custom-build1
 -rw-r--r-- 1 root root 1958212 2009-01-30 17:34 /boot/initrd.img-2.6.28-custom-build1
 -rw-r--r-- 1 root root 1173217 2009-01-29 00:07 /boot/System.map-2.6.28-custom-build1
--rw-r--r-- 1 root root 2899952 2009-01-29 00:07 /boot/vmlinuz-2.6.28-custom-build1</pre>
+-rw-r--r-- 1 root root 2899952 2009-01-29 00:07 /boot/vmlinuz-2.6.28-custom-build1{{< /highlight >}}
 
 We are done, reboot
 

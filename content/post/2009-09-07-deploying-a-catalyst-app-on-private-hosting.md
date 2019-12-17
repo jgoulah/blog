@@ -24,15 +24,15 @@ As I probably sound like a broken record if you&#8217;ve read any of my other pe
 
 For now, you&#8217;ll want to also make sure  you have <a title="FCGI" href="http://search.cpan.org/~skimo/FCGI-0.67/FCGI.PL" target="_blank">FCGI</a> and <a title="fcgi::procmanager" href="http://search.cpan.org/~gbjk/FCGI-ProcManager-0.19/ProcManager.pm" target="_blank">FCGI::ProcManager</a> installed as that user that you just setup along with the rest of your apps modules.
 
-<pre>$ cpan FCGI
+{{< highlight bash >}}$ cpan FCGI
 $ cpan FCGI::ProcManager
-</pre>
+{{< /highlight >}}
 
 You may want to checkout your app under this user, so that you can just do 
 
-<pre>$ perl Makefile.PL
+{{< highlight bash >}}$ perl Makefile.PL
 $ make installdeps
-</pre>
+{{< /highlight >}}
 
 assuming you&#8217;ve kept your Makefile.PL updated, this should be all of the perl modules you need to run your application.
 
@@ -40,25 +40,25 @@ assuming you&#8217;ve kept your Makefile.PL updated, this should be all of the p
 
 You can setup <a title="apache" href="http://httpd.apache.org/" target="_blank">apache</a> using your package manager of choice.  For ease of this article I&#8217;ll assume you&#8217;re on Ubuntu, or Debian based system, and you can do something like
 
-<pre>$ sudo apt-get install apache2.2-common
+{{< highlight bash >}}$ sudo apt-get install apache2.2-common
 $ sudo apt-get install apache2-mpm-worker
-</pre>
+{{< /highlight >}}
 
 And you also need the <a title="mod_fastcgi" href="http://www.fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html" target="_blank">mod_fastcgi</a> module.  You could <a title="download fastcgi" href="http://www.fastcgi.com/dist/" target="_blank">download</a> and compile it.  Or you could grab it from apt.   You&#8217;ll probably have to add the multiverse repository,  so update your _/etc/apt/sources.list_so that each line will end with
 
-<pre>main restricted universe multiverse</pre>
+{{< highlight bash >}}main restricted universe multiverse{{< /highlight >}}
 
 Now you can
 
-<pre>$ sudo apt-get update
+{{< highlight bash >}}$ sudo apt-get update
 $ sudo apt-get install libapache2-mod-fastcgi
-</pre>
+{{< /highlight >}}
 
 ## Setup the VirtualHost and App Directory Structure
 
 You need to put a VirtualHost so that Apache knows how to handle the requests to your domain
 
-<pre>FastCgiExternalServer /opt/mysite.com/fake/prod -socket /opt/mysite.com/run/prod.socket
+{{< highlight bash >}}FastCgiExternalServer /opt/mysite.com/fake/prod -socket /opt/mysite.com/run/prod.socket
 
 &lt;VirtualHost *:80&gt;
 ServerName www.mysite.com
@@ -67,14 +67,14 @@ DocumentRoot /opt/mysite.com/app
 Alias /static /opt/mysite.com/app/root/static/
 Alias / /opt/mysite.com/fake/prod/
 &lt;/VirtualHost&gt;
-</pre>
+{{< /highlight >}}
 
 This &#8220;/&#8221; alias ties your document root to the listening socket defined in the FastCgiExternalServer line. The &#8220;/static&#8221; alias make sure your static files are served by apache, instead of fastcgi. 
 
 This config also assumes some directory structure is setup,  which is really entirely up to you.  But here we&#8217;ll assume you have a directory located at _/opt/mysite.com_ with a few directories under that called _fake_, _run_, and _app_.
 
-<pre>$ sudo mkdir -p /opt/mysite.com/{fake,run,app}
-</pre>
+{{< highlight bash >}}$ sudo mkdir -p /opt/mysite.com/{fake,run,app}
+{{< /highlight >}}
 
 The only directory you have to put anything in is _app_, which should contain your code.
 
@@ -84,14 +84,14 @@ Note, this is a very simplified layout.  In the real world I&#8217;d put the _f
 
 The last piece of the puzzle is to have a launch script,  which makes sure that your app is listening on the socket.  So to keep it simple you would have a script called _launch_mysite.sh_ that looks like this
 
-<pre>#!/bin/sh
+{{< highlight bash >}}#!/bin/sh
 
 export PERL5OPT='-Mlib=/home/perl_module_user/perl5/lib/perl5'
 
 /opt/mysite.com/app/script/mysite_fastcgi.pl \
 -l /opt/mysite.com/run/prod.socket -e \
 -p  /opt/mysite.com/run/prod.pid -n 15
-</pre>
+{{< /highlight >}}
 
 The first line is telling the script to use the modules from the user we setup the local::lib to hold the modules, so make sure you change this to the correct location.  Then it starts up fastcgi to listen on your socket, and create a process pid,  and to spawn in this case 15 processes to handle requests. Go ahead and hit your domain, and it should show you your website. 
 

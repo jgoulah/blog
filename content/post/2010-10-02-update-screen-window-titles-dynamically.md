@@ -18,7 +18,7 @@ I haven&#8217;t had a ton of time for blogging lately but figured this tip was g
 
 Turns out thats a lot of repetitive work that can easily be scripted. You can create a really simple script called _ssh-to_ and place in your _~/bin_ or somewhere in your path
 
-<pre>#!/bin/bash
+{{< highlight bash >}}#!/bin/bash
 
 hostname=`basename $0`
 
@@ -30,7 +30,7 @@ ssh -X $hostname $*
 
 # set hostname back when session is done (-s on osx)
 echo -n -e "\033k`hostname -s`\033\134"
-</pre>
+{{< /highlight >}}
 
 Now, create symbolic links to the script with each server hostname that you use. This can be a little tedious but you only have to do it once and the benefit is that you can now tab complete ssh&#8217;ing into servers. 
 

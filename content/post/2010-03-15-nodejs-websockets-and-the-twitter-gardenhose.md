@@ -29,21 +29,21 @@ In this article I&#8217;m going to demonstrate how to use the <a href="http://ap
 
 First things first, you need <a href="http://github.com/ry/node" target="_blank">node.js</a>, which you can get from github. Install in the usual way
 
-<pre>$ git clone git://github.com/ry/node.git
+{{< highlight bash >}}$ git clone git://github.com/ry/node.git
 $ cd node
 $ ./configure
 $ make
 $ sudo make install
-</pre>
+{{< /highlight >}}
 
 Then we&#8217;ll need <a href="http://github.com/guille/node.websocket.js/" target="_blank">node.websocket.js</a> which you can also get from github
 
-<pre>$ git clone git://github.com/Guille/node.websocket.js.git
-</pre>
+{{< highlight bash >}}$ git clone git://github.com/Guille/node.websocket.js.git
+{{< /highlight >}}
 
 This is basically an experimental implementation of the web socket API. You can create simple server side modules and then a client side implementation that opens up a web socket to the server in which you can then exchange data in both directions. There are a few examples included that you can take a look at including a simple echo server and a chat server. Just fire up the server like so
 
-<pre>$ node runserver.js</pre>
+{{< highlight bash >}}$ node runserver.js{{< /highlight >}}
 
 and then open up one of the html files in the _test/websocket/_ directory in your browser. One catch though, you&#8217;ll need a current browser such as <a href="http://www.google.com/chrome" target="_blank">Google Chrome</a>. I&#8217;d recommend it anyway, as browsing the web with it does run a bit smoother. 
 
@@ -53,7 +53,7 @@ You&#8217;ll also need <a href="http://curl.haxx.se/" target="_blank">curl</a>, 
 
 The way we&#8217;re going to implement the server is to use the curl command to pull from the twitter stream into a file. Twitter gives you a bunch of JSON objects back which you can then parse and display. We&#8217;ll use this file in a moment to send the data over the web socket to the browser. There is some <a href="http://apiwiki.twitter.com/Streaming-API-Documentation" target="_blank">documentation</a> on what you can do with the API but we&#8217;ll keep it simple and search for any tweets with &#8216;nyc&#8217; in them
 
-<pre>$ curl -dtrack=nyc http://stream.twitter.com/1/statuses/filter.json  -uUSERNAME:PASSWORD > sample.json</pre>
+{{< highlight bash >}}$ curl -dtrack=nyc http://stream.twitter.com/1/statuses/filter.json  -uUSERNAME:PASSWORD > sample.json{{< /highlight >}}
 
 Now its time to write some server side javascript. In the node.websocket.js checkout there is a _modules/_ directory. We&#8217;ll create a new module called _gardenhose.js_. So the full path is _node.websocket.js/modules/gardenhose.js_
 
@@ -67,11 +67,11 @@ Therefore the onData method is the one we need to implement in our module above.
 
 Just make sure the file you pass in is the correct path to the file you are outputting to from the curl command in the monitor_file() function. Then to run the node.websocket.js server you can just invoke it like so
 
-<pre>$ node runserver.js</pre>
+{{< highlight bash >}}$ node runserver.js{{< /highlight >}}
 
 However if you are running the server from another host, you may want to listen on more than just the default of localhost
 
-<pre>$ node runserver.js --host=0.0.0.0</pre>
+{{< highlight bash >}}$ node runserver.js --host=0.0.0.0{{< /highlight >}}
 
 ## Setting Up the Client
 

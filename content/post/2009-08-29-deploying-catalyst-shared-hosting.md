@@ -29,18 +29,18 @@ There are some basic assumptions here. First we need a Linux webserver that has 
 
 The best way to install the modules your application depends on is using <a href="http://search.cpan.org/~apeiron/local-lib-1.004006/lib/local/lib.pm" target="_blank">local::lib</a>. I&#8217;ve talked about this <a href="http://www.catalystframework.org/calendar/2007/8" target="_blank">before</a> so there isn&#8217;t a lot of need to go over the process in detail again, but in a nutshell you can do 
 
-<pre>$ wget http://search.cpan.org/CPAN/authors/id/A/AP/APEIRON/local-lib-1.004006.tar.gz
+{{< highlight bash >}}$ wget http://search.cpan.org/CPAN/authors/id/A/AP/APEIRON/local-lib-1.004006.tar.gz
 $ tar xzvf local-lib-1.004006.tar.gz
 $ cd local-lib-1.004006
 $ perl Makefile.PL --bootstrap
 $ make test && make install
 $ echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >>~/.bashrc
 $ source ~/.bashrc
-</pre>
+{{< /highlight >}}
 
 Now you have an environment that you can install your modules into. By default this is localized to ~/perl5. The next step is to install your modules that the application requires. It is good practice to put these into your Makefile.PL so that you can easily install them in one shot. A very basic one would follow this template
 
-<pre>use inc::Module::Install;
+{{< highlight bash >}}use inc::Module::Install;
 
 name 'MyApp';
 all_from 'lib/MyApp.pm';
@@ -52,14 +52,14 @@ requires 'Config::General';
 install_script glob('script/*.pl');
 auto_install;
 WriteAll;
-</pre>
+{{< /highlight >}}
 
 Now its easy to do
 
-<pre>$ export PERL_MM_USE_DEFAULT=1
+{{< highlight bash >}}$ export PERL_MM_USE_DEFAULT=1
 $ perl Makefile.PL
 $ make installdeps
-</pre>
+{{< /highlight >}}
 
 The PERL\_MM\_USE_DEFAULT will configure things such that you don&#8217;t have to press enter at every question about a dependency. The make installdeps will install any missing modules, which in this case is going to be everything. You can upgrade the version numbers in the Makefile.PL &#8220;requires&#8221; lines if you want installdeps to grab the newer distributions as they are released to CPAN.
 
@@ -67,21 +67,21 @@ The PERL\_MM\_USE_DEFAULT will configure things such that you don&#8217;t have t
 
 First thing we have to do is a minor edit to our fastcgi script, which is to tell it to use our local::lib. Since its not part of the environment we setup earlier in .bashrc we have to tell the fastcgi perl script where to find things. Below the &#8220;use warnings;&#8221; line add this
 
-<pre>use lib "/home/myuser/perl5/lib/perl5";
+{{< highlight bash >}}use lib "/home/myuser/perl5/lib/perl5";
 use local::lib;
-</pre>
+{{< /highlight >}}
 
 Make sure to change the path to the correct location of your perl5 modules directory.
 
 The last thing is to make sure your app is located in the public directory root for your host. In my case I created a symbolic link from the public_html folder to my app. 
 
-<pre>$ cd && mv public_html public_html.old  # get rid of current root folder
+{{< highlight bash >}}$ cd && mv public_html public_html.old  # get rid of current root folder
 $ ln -s ~/myapp ~/public_html
-</pre>
+{{< /highlight >}}
 
 Then create a _.htaccess_ file in that folder, which should reside beside all of your code
 
-<pre>Options ExecCGI FollowSymLinks
+{{< highlight bash >}}Options ExecCGI FollowSymLinks
 Order allow,deny
 Allow from all
 AddHandler fcgid-script .pl
@@ -90,7 +90,7 @@ RewriteEngine On
 RewriteCond %{REQUEST_URI} !^/?script/myapp_fastcgi.pl
 RewriteRule ^(.*)$ script/myapp_fastcgi.pl/$1 [PT,L]
 RewriteRule ^static/(.*)$ static/$1 [PT,L]
-</pre>
+{{< /highlight >}}
 
 We&#8217;re just telling apache to turn CGI on, and make sure to execute our fastcgi perl script. Be sure to change the rewrite lines to point to your script (hint: change myapp to your app name).
 

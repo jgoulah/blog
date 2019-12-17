@@ -26,46 +26,46 @@ DenyHosts can be found <a href="http://denyhosts.sourceforge.net/" target="_blan
 
 We&#8217;ll grab the tarball
 
-<pre>$ wget \
-http://internap.dl.sourceforge.net/sourceforge/denyhosts/DenyHosts-2.6.tar.gz</pre>
+{{< highlight bash >}}$ wget \
+http://internap.dl.sourceforge.net/sourceforge/denyhosts/DenyHosts-2.6.tar.gz{{< /highlight >}}
 
 Extract and install
 
-<pre>$  tar xzvf DenyHosts-2.6.tar.gz
+{{< highlight bash >}}$  tar xzvf DenyHosts-2.6.tar.gz
 $  cd DenyHosts-2.6
-$  sudo python setup.py install</pre>
+$  sudo python setup.py install{{< /highlight >}}
 
 This installs it into _/usr/share/denyhosts_ so we&#8217;ll change directory
 
-<pre>$ cd /usr/share/denyhosts</pre>
+{{< highlight bash >}}$ cd /usr/share/denyhosts{{< /highlight >}}
 
 Copy the default config
 
-<pre>$  sudo cp denyhosts.cfg-dist denyhosts.cfg</pre>
+{{< highlight bash >}}$  sudo cp denyhosts.cfg-dist denyhosts.cfg{{< /highlight >}}
 
 We need to set a few values in this file. The default values are for RedHat and this is how it looks on Debian
 
-<pre>SECURE_LOG = /var/log/auth.log
-LOCK_FILE = /var/run/denyhosts.pid</pre>
+{{< highlight bash >}}SECURE_LOG = /var/log/auth.log
+LOCK_FILE = /var/run/denyhosts.pid{{< /highlight >}}
 
 You may also want to set the _DENY\_THRESHOLD\_INVALID_ and _DENY\_THRESHOLD\_VALID_ values, which controls the threshold of failed login attempts for fake and real users respectively.
 
 Now we need to setup the script that controls the deamon that does the work. There is a default one available so we can copy that
 
-<pre>$ sudo cp daemon-control-dist daemon-control</pre>
+{{< highlight bash >}}$ sudo cp daemon-control-dist daemon-control{{< /highlight >}}
 
 There is only one value to change here on Debian
 
-<pre>DENYHOSTS_LOCK = "/var/run/denyhosts.pid"</pre>
+{{< highlight bash >}}DENYHOSTS_LOCK = "/var/run/denyhosts.pid"{{< /highlight >}}
 
 Now symlink the control script into our bootup scripts folder and add it to start on boot
 
-<pre>$  sudo ln -s /usr/share/denyhosts/daemon-control /etc/init.d/denyhosts
-$  sudo update-rc.d denyhosts defaults</pre>
+{{< highlight bash >}}$  sudo ln -s /usr/share/denyhosts/daemon-control /etc/init.d/denyhosts
+$  sudo update-rc.d denyhosts defaults{{< /highlight >}}
 
 Finally start it up for the first time
 
-<pre>$  sudo /etc/init.d/denyhosts start</pre>
+{{< highlight bash >}}$  sudo /etc/init.d/denyhosts start{{< /highlight >}}
 
 If you haven&#8217;t changed the default you can find the logs in _/var/log/denyhosts_ if you want to see what its doing.
 

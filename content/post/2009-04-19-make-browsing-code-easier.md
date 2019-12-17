@@ -31,11 +31,11 @@ There&#8217;s really not much to installing ctags.  You could <a title="ctags d
 
 If you&#8217;re using Debian or Ubuntu you can do:
 
-<pre>sudo apt-get install exuberant-ctags</pre>
+{{< highlight bash >}}sudo apt-get install exuberant-ctags{{< /highlight >}}
 
 Similarly in CentOS and Redhat based distros:
 
-<pre>sudo yum install ctags</pre>
+{{< highlight bash >}}sudo yum install ctags{{< /highlight >}}
 
 ## Usage
 
@@ -49,7 +49,7 @@ For these examples I&#8217;m going to send the output to a file in my _~/.vim/ta
 
 #### PHP
 
-<pre>$ cat bin/ctags_php
+{{< highlight bash >}}$ cat bin/ctags_php
 #!/bin/bash
 cd ~/mysandbox/myphpproject
 ctags -f ~/.vim/tags/myphpproject \
@@ -61,52 +61,52 @@ ctags -f ~/.vim/tags/myphpproject \
 --PHP-kinds=+cf-v \
 --regex-PHP='/abstract\s+class\s+([^ ]+)/\1/c/' \
 --regex-PHP='/interface\s+([^ ]+)/\1/c/' \
---regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/'</pre>
+--regex-PHP='/(public\s+|static\s+|abstract\s+|protected\s+|private\s+)function\s+\&?\s*([^ (]+)/\2/f/'{{< /highlight >}}
 
 and when you run it, you&#8217;ll see something like:
 
-<pre>$ ctags_php
+{{< highlight bash >}}$ ctags_php
 498 files, 66678 lines (2624 kB) scanned in 0.6 seconds (4604 kB/s)
 1643 tags added to tag file
-1643 tags sorted in 0.00 seconds</pre>
+1643 tags sorted in 0.00 seconds{{< /highlight >}}
 
 #### Perl
 
 In Perl you can do things a bit smarter since you _should_ have a Makefile.PL script to keep track of your dependencies. If so you can add:
 
-<pre>postamble(
+{{< highlight bash >}}postamble(
 q!
 tags:
 ctags -f ~/.vim/tags/myperlcode --recurse --totals \
 --exclude=blib \
 --exclude='*~' \
 --languages=Perl --langmap=Perl:+.t \
-!);</pre>
+!);{{< /highlight >}}
 
 Then you should do:
 
-<pre>perl Makefile.PL
-make tags</pre>
+{{< highlight bash >}}perl Makefile.PL
+make tags{{< /highlight >}}
 
 #### C++
 
 You can do a very similar thing for C++ code
 
-<pre>$ cd /path/to/code
+{{< highlight bash >}}$ cd /path/to/code
 $ ctags -f ~/.vim/tags/myc++code --tag-relative=yes --recurse --language-force=c++ *
-</pre>
+{{< /highlight >}}
 
 #### Java
 
 Or say we want to tag the entire java library itself
 
-<pre>$ ctags -f ~/.vim/tags/java -R --language-force=java /opt/java/src</pre>
+{{< highlight bash >}}$ ctags -f ~/.vim/tags/java -R --language-force=java /opt/java/src{{< /highlight >}}
 
 ### Letting VI know about your files
 
 After creating one or more tagfiles you should edit your _~/.vimrc_ file and add the location to your tag files and separate the entries by commas or spaces
 
-<pre>set tags=~/.vim/tags/myphpproject,~/.vim/tags/myperlcode</pre>
+{{< highlight bash >}}set tags=~/.vim/tags/myphpproject,~/.vim/tags/myperlcode{{< /highlight >}}
 
 ### Navigating Around the Code
 
@@ -114,11 +114,11 @@ In VI there are two easy commands to jump around.
 
 To move to the definition of a method/variable, place the cursor over it and press
 
-<pre>Ctrl + ]</pre>
+{{< highlight bash >}}Ctrl + ]{{< /highlight >}}
 
 And to jump back
 
-<pre>Ctrl + t</pre>
+{{< highlight bash >}}Ctrl + t{{< /highlight >}}
 
 If you try to jump to something and it isn&#8217;t found, its probably something in a library you&#8217;re using, so you&#8217;ll have to grab the source and tag those too.
 
@@ -132,25 +132,25 @@ There are a few ways to install ack listed on the <a title="ack" href="http://be
 
 The best thing I can really tell you is to read the ack help
 
-<pre>$ ack --help</pre>
+{{< highlight bash >}}$ ack --help{{< /highlight >}}
 
 Ack takes a regular expression as the first argument and a directory to search as the second. Typically you want to search all (_-a_) files or in a case insensitive fashion (_-i_)
 
-<pre>$ ack -ai 'searchstring' .</pre>
+{{< highlight bash >}}$ ack -ai 'searchstring' .{{< /highlight >}}
 
 Or you can search specific file types 
 
-<pre>$ ack --perl  searchterm</pre>
+{{< highlight bash >}}$ ack --perl  searchterm{{< /highlight >}}
 
 And one really cool thing is though ack gives nice colorized output in a structured fashion, if you pipe it to another process it outputs like grep by default so that you can continue to pipe it
 
 For example lets say I want to find the modules <a href="http://search.cpan.org/~jjnapiork/MooseX-Types-0.10/"  target="_blank">MooseX::Types</a> is using 
 
-<pre>ack -a '^use.*;' ~/perl5/lib/perl5/MooseX/Types/</pre>
+{{< highlight bash >}}ack -a '^use.*;' ~/perl5/lib/perl5/MooseX/Types/{{< /highlight >}}
 
 It gives something looking like (output truncated)
 
-<pre>/home/jgoulah/perl5/lib/perl5/MooseX/Types/Util.pm
+{{< highlight bash >}}/home/jgoulah/perl5/lib/perl5/MooseX/Types/Util.pm
 9:use warnings;
 10:use strict;
 12:use base 'Exporter';
@@ -161,31 +161,31 @@ It gives something looking like (output truncated)
 12:use MooseX::Types;
 13:use Moose::Util::TypeConstraints ();
 15:use namespace::clean -except => [qw( meta )];
-</pre>
+{{< /highlight >}}
 
 If you pipe the output it looks more like grep output
 
-<pre>ack -a '^use.*;' ~/perl5/lib/perl5/MooseX/Types/ | cat</pre>
+{{< highlight bash >}}ack -a '^use.*;' ~/perl5/lib/perl5/MooseX/Types/ | cat{{< /highlight >}}
 
 Again the output is truncated but looks like
 
-<pre>/home/jgoulah/perl5/lib/perl5/MooseX/Types/Base.pm:11:use MooseX::Types::Util             qw( filter_tags );
+{{< highlight bash >}}/home/jgoulah/perl5/lib/perl5/MooseX/Types/Base.pm:11:use MooseX::Types::Util             qw( filter_tags );
 /home/jgoulah/perl5/lib/perl5/MooseX/Types/Base.pm:12:use Sub::Exporter                   qw( build_exporter );
 /home/jgoulah/perl5/lib/perl5/MooseX/Types/Base.pm:13:use Moose::Util::TypeConstraints;
 /home/jgoulah/perl5/lib/perl5/MooseX/Types/Base.pm:15:use namespace::clean -except => [qw( meta )];
-</pre>
+{{< /highlight >}}
 
 Lets say for example reasons I wanted to find all the modules used in the code and make sure they are installed (using the &#8216;make install&#8217; command in the module would be the more correct and easier way), you could do
 
-<pre>$ ack -ah '^use\s[^\d].*;' ~/perl5/lib/perl5/MooseX/Types/ | \
+{{< highlight bash >}}$ ack -ah '^use\s[^\d].*;' ~/perl5/lib/perl5/MooseX/Types/ | \
   ack -v 'warnings|strict|base' | \
   perl -ne "m|use ((\w+:?:?)+)(.*)(;)|; print qq{\$1\n};" | \
   sort -u | xargs cpan
-</pre>
+{{< /highlight >}}
 
 which cleans the output and gives the module list to cpan for installation and it lets me know I have everything installed and up to date
 
-<pre>Carp::Clan is up to date (6.00).
+{{< highlight bash >}}Carp::Clan is up to date (6.00).
 Class::MOP is up to date (0.81).
 Devel::PartialDump is up to date (0.07).
 Moose is up to date (0.74).
@@ -197,7 +197,7 @@ MooseX::Types::Util is up to date (undef).
 namespace::clean is up to date (0.11).
 Scalar::Util is up to date (1.19).
 Sub::Exporter is up to date (0.982).
-</pre>
+{{< /highlight >}}
 
 # Conclusion
 

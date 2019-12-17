@@ -21,25 +21,25 @@ The <a href="http://gist.github.com/" target="_blank">gist</a> service on <a hre
 
 First off install the tool from cpan
 
-<pre>$ cpan App::Nopaste</pre>
+{{< highlight bash >}}$ cpan App::Nopaste{{< /highlight >}}
 
 You can use this tool anonymously but if you want to keep an archive of your pastes you can simply setup your git credentials in your _.gitconfig_ file. The token here is your API token which can be found under your account settings page.
 
-<pre>[github]
+{{< highlight bash >}}[github]
         user = jgoulah
         token = 00000000000000000000000000000000
-</pre>
+{{< /highlight >}}
 
 You also need either Git installed or Config::INI::Reader to allow the module to read your _.gitconfig_ file.
 
 Now to make this a bit easier to remember we can create an alias in our _.bashrc_ file. In this case I&#8217;m specifying _&#8211;private_ so that only people that I give this secure URL out to can see, and I&#8217;m also specifying to use the Gist service. The nopaste app supports a variety of other services that you can use but as of this writing Gist is the only one that supports the _&#8211;private_ flag. 
 
-<pre>alias gist='nopaste --private --service Gist'</pre>
+{{< highlight bash >}}alias gist='nopaste --private --service Gist'{{< /highlight >}}
 
 Now you can use the command to paste something such as a script from the command line and the gist URL is returned
 
-<pre>$ gist somescript.sh
+{{< highlight bash >}}$ gist somescript.sh
 http://gist.github.com/df552bacbbbb8d70c089
-</pre>
+{{< /highlight >}}
 
 There you have it!

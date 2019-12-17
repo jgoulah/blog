@@ -29,7 +29,7 @@ Combining these two ideas, I can capture separate audio and video streams, and s
 
 The command to do our transcoding is pretty simple. On the server side after you have received the files from our POST requests, you would do something like this, replacing the input files names with those from the recording:
 
-<pre>avconv -i input.wav -i input.webm -acodec copy -vcodec copy output.mkv</pre>
+{{< highlight bash >}}avconv -i input.wav -i input.webm -acodec copy -vcodec copy output.mkv{{< /highlight >}}
 
 And the file _output.mkv_ that is produced will contain the video with your audio stream. 
 

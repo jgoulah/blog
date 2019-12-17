@@ -30,12 +30,12 @@ You can download the MySQL tarball from any <a href=" http://dev.mysql.com/downl
 
 First you need to extract the MySQL Sandbox tool and change directory to it:
 
-<pre>$ tar xzvf mysql_sandbox_2.0.12.tar.gz
-$ cd mysql_sandbox_2.0.12</pre>
+{{< highlight bash >}}$ tar xzvf mysql_sandbox_2.0.12.tar.gz
+$ cd mysql_sandbox_2.0.12{{< /highlight >}}
 
 The easiest and quickest way to create an instance is:
 
-<pre>$ ./make_sandbox /path/to/mysql-X.X.XX-osinfo.tar.gz</pre>
+{{< highlight bash >}}$ ./make_sandbox /path/to/mysql-X.X.XX-osinfo.tar.gz{{< /highlight >}}
 
 where _mysql-X.X.XX-osinfo.tar.gz_ is the MySQL tarball we just downloaded. And you&#8217;re done.
 
@@ -45,14 +45,14 @@ However, this will put the sandbox in a directory under your home directory ($HO
 
 I want to put my instance into a partition I created called _/mnt/mysql_sandboxes_. I&#8217;ve created a subdirectory in there called _tarballs_, which holds the MySQL tarball that we downloaded above which MySQL Sandbox will extract for setup. Since I&#8217;m installing version 5.1.30 I want to call the directory that houses the MySQL data files _5.1.30_single_, but you can call it anything you like. I&#8217;ll create a default user named _jgoulah_ and a password _goulah_. By default it sets the port to the version number without the dots (5130 in this case) so we&#8217;ll give it a custom port so that it listens on 10000 instead.
 
-<pre>mysql_sandbox_2.0.12 $  ./make_sandbox \
+{{< highlight bash >}}mysql_sandbox_2.0.12 $  ./make_sandbox \
 /mnt/mysql_sandboxes/tarballs/mysql-5.1.30-linux-i686-icc-glibc23.tar.gz \
 --upper_directory=/mnt/mysql_sandboxes/ --sandbox_directory=5.1.30_single \
---db_user=jgoulah --db_password=goulah --sandbox_port=10000</pre>
+--db_user=jgoulah --db_password=goulah --sandbox_port=10000{{< /highlight >}}
 
 Here&#8217;s the output:
 
-<pre>unpacking /mnt/mysql_sandboxes/tarballs/mysql-5.1.30-linux-i686-icc-glibc23.tar.gz
+{{< highlight bash >}}unpacking /mnt/mysql_sandboxes/tarballs/mysql-5.1.30-linux-i686-icc-glibc23.tar.gz
 Executing ./low_level_make_sandbox \
         --basedir=/mnt/mysql_sandboxes/tarballs/5.1.30 \
         --sandbox_directory=msb_5_1_30 \
@@ -95,41 +95,41 @@ To repeat this installation with the same options,
 use ./low_level_make_sandbox --conf_file=current_options.conf
 ----------------------------------------
 Your sandbox server was installed in /mnt/mysql_sandboxes//5.1.30_single
-</pre>
+{{< /highlight >}}
 
 Its now installed and started up, we can see that the process is running with the correct options:
 
-<pre>$  ps -ef | grep mysql | grep jgoulah
+{{< highlight bash >}}$  ps -ef | grep mysql | grep jgoulah
 jgoulah  11128     1  0 13:48 pts/3    00:00:00 /bin/sh /mnt/mysql_sandboxes/tarballs/5.1.30/bin/mysqld_safe --defaults-file=/mnt/mysql_sandboxes//5.1.30_single/my.sandbox.cnf
-jgoulah  11203 11128  0 13:48 pts/3    00:00:00 /mnt/mysql_sandboxes/tarballs/5.1.30/bin/mysqld --defaults-file=/mnt/mysql_sandboxes//5.1.30_single/my.sandbox.cnf --basedir=/mnt/mysql_sandboxes/tarballs/5.1.30 --datadir=/mnt/mysql_sandboxes//5.1.30_single/data --user=jgoulah --log-error=/mnt/mysql_sandboxes//5.1.30_single/data/msandbox.err --pid-file=/mnt/mysql_sandboxes//5.1.30_single/data/mysql_sandbox10000.pid --socket=/tmp/mysql_sandbox10000.sock --port=10000</pre>
+jgoulah  11203 11128  0 13:48 pts/3    00:00:00 /mnt/mysql_sandboxes/tarballs/5.1.30/bin/mysqld --defaults-file=/mnt/mysql_sandboxes//5.1.30_single/my.sandbox.cnf --basedir=/mnt/mysql_sandboxes/tarballs/5.1.30 --datadir=/mnt/mysql_sandboxes//5.1.30_single/data --user=jgoulah --log-error=/mnt/mysql_sandboxes//5.1.30_single/data/msandbox.err --pid-file=/mnt/mysql_sandboxes//5.1.30_single/data/mysql_sandbox10000.pid --socket=/tmp/mysql_sandbox10000.sock --port=10000{{< /highlight >}}
 
 And we can connect to it on the port 10000:
 
-<pre>$  mysql -u jgoulah --protocol=TCP  -P 10000 -pgoulah</pre>
+{{< highlight bash >}}$  mysql -u jgoulah --protocol=TCP  -P 10000 -pgoulah{{< /highlight >}}
 
 You can also go into the directory where we&#8217;ve installed this and there are some convenience scripts:
 
-<pre>$ cd /mnt/mysql_sandboxes/5.1.30_single/</pre>
+{{< highlight bash >}}$ cd /mnt/mysql_sandboxes/5.1.30_single/{{< /highlight >}}
 
 You can run the _use_ script to connect into mysql (same thing we just did above except we don&#8217;t have to remember our port, user, or pass):
 
-<pre>$ ./use
+{{< highlight bash >}}$ ./use
 Welcome to the MySQL monitor.  Commands end with ; or \g.
 Your MySQL connection id is 5
 Server version: 5.1.30 MySQL Community Server (GPL)
 
 Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
 
-mysql [localhost] {jgoulah} ((none)) ></pre>
+mysql [localhost] {jgoulah} ((none)) >{{< /highlight >}}
 
 Stop the instance:
 
-<pre>$  ./stop</pre>
+{{< highlight bash >}}$  ./stop{{< /highlight >}}
 
 Or start it back up again:
 
-<pre>$  ./start
-. sandbox server started</pre>
+{{< highlight bash >}}$  ./start
+. sandbox server started{{< /highlight >}}
 
 There are a few other scripts which you can experiment with in this directory which are <a href="http://forge.mysql.com/wiki/MySQL_Sandbox#USING_A_SANDBOX" target="_blank">documented here</a>
 
@@ -139,7 +139,7 @@ The nice thing about this tool is it will also setup replicated instances of MyS
 
 We&#8217;ll use similar options as the single instance above, except we&#8217;ll use port 11000 this time (the slaves get port + 1, &#8230;, port + n where n is number of slaves). We&#8217;ll put the install into _/mnt/mysql\_sandboxes/5.1.30\_replicated_. Note this time we use the _make\_replication\_sandbox_ script:
 
-<pre>mysql_sandbox_2.0.12 $  ./make_replication_sandbox \
+{{< highlight bash >}}mysql_sandbox_2.0.12 $  ./make_replication_sandbox \
 /mnt/mysql_sandboxes/tarballs/mysql-5.1.30-linux-i686-icc-glibc23.tar.gz \
 --upper_directory=/mnt/mysql_sandboxes/ \
 --replication_directory=5.1.30_replicated --sandbox_base_port=11000
@@ -152,7 +152,7 @@ starting slave 2
 . sandbox server started
 initializing slave 1
 initializing slave 2
-replication directory installed on /mnt/mysql_sandboxes//5.1.30_replicated</pre>
+replication directory installed on /mnt/mysql_sandboxes//5.1.30_replicated{{< /highlight >}}
 
 Now we have a master and two slaves going. Note that the command to setup replicated sandboxes will not let us specify the user as we did with the single instance, but two users are created by default:
 
@@ -162,23 +162,23 @@ User: msandbox@% Password: msandbox
 
 You can run the _use_ script as shown above, or connect directly to the master:
 
-<pre>$  mysql -u msandbox --protocol=TCP  -P 11000 -pmsandbox</pre>
+{{< highlight bash >}}$  mysql -u msandbox --protocol=TCP  -P 11000 -pmsandbox{{< /highlight >}}
 
 Create a database:
 
-<pre>mysql> create database jg_repl_test;
-mysql> exit;</pre>
+{{< highlight bash >}}mysql> create database jg_repl_test;
+mysql> exit;{{< /highlight >}}
 
 Connect to one of the slaves:
 
-<pre>$  mysql -u msandbox --protocol=TCP  -P 11001 -pmsandbox
+{{< highlight bash >}}$  mysql -u msandbox --protocol=TCP  -P 11001 -pmsandbox
 mysql> show databases like '%jg_%';
 +------------------+
 | Database (%jg_%) |
 +------------------+
 | jg_repl_test     |
 +------------------+
-</pre>
+{{< /highlight >}}
 
 And we can see that it has replicated across.
 

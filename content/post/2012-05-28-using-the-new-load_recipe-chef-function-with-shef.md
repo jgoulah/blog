@@ -20,24 +20,24 @@ Shef gives an easy way to iterate on your recipes so that you can make small cha
 
 You can see the list of resources that are loaded up like so
 
-<pre>chef:recipe > puts run_context.resource_collection.all_resources
+{{< highlight bash >}}chef:recipe > puts run_context.resource_collection.all_resources
 package[php]
-package[php-common]</pre>
+package[php-common]{{< /highlight >}}
 
 If you were to call _load_recipe_ again the list would double, and the new code would be run second when calling _run_chef_
 
-<pre>chef:recipe > puts run_context.resource_collection.all_resources
+{{< highlight bash >}}chef:recipe > puts run_context.resource_collection.all_resources
 package[php]
 package[php-common]
 package[php]
-package[php-common]</pre>
+package[php-common]{{< /highlight >}}
 
 The trick is that you can clear this list with this command
 
-<pre>run_context.resource_collection = Chef::ResourceCollection.new</pre>
+{{< highlight bash >}}run_context.resource_collection = Chef::ResourceCollection.new{{< /highlight >}}
 
 So to use _load_recipe_ you should call the above before it to clear the current list. This can be done in one line like so
 
-<pre>run_context.resource_collection = Chef::ResourceCollection.new; load_recipe "php"</pre>
+{{< highlight bash >}}run_context.resource_collection = Chef::ResourceCollection.new; load_recipe "php"{{< /highlight >}}
 
 Hopefully I&#8217;ll be able to patch things to add a _reload_recipe_ that overwrites the old resources so you don&#8217;t have to use this trick, but for now this will work to get quick iterations going.

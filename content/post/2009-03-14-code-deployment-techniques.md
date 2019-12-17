@@ -33,37 +33,37 @@ The build should also be responsible for putting the code into a versioned direc
 
 I&#8217;ve explained that your build script should generate a version and it makes sense for this to come from your repository revision that is getting deployed. Here&#8217;s a short bash function that can generate a version from an SVN repository (also works with SVK which is an SVN wrapper)
 
-<pre>function get_version {
+{{< highlight bash >}}function get_version {
   if [ -e .svn ]; then
     eval $1=$(svn info | grep ^Revision | perl -ne "/Revision: (\d+)/; printf('1.%06i', \$1);")
   else
     eval $1=$(svk info | grep "Mirrored From" | perl -ne "/Rev. (\d+)/; printf('1.%06i', \$1);")
   fi
-}</pre>
+}{{< /highlight >}}
 
 and now the build script can do something like
 
-<pre>cd /path/to/svn/checkout
+{{< highlight bash >}}cd /path/to/svn/checkout
 svn up
 get_version version
-echo "this is the version: $version"</pre>
+echo "this is the version: $version"{{< /highlight >}}
 
 ### Exporting the Code
 
 Now that you&#8217;ve generated a version you should export that version of code into the directory you are going to push from. For this example we&#8217;ll say that we store versions in _/opt/test.com_ so the structure might look something like:
 
-<pre>/opt/test.com
+{{< highlight bash >}}/opt/test.com
      {version1}
      {version2}
      {versionN}
-     ...</pre>
+     ...{{< /highlight >}}
 
 Then the code would live under _version1_, _version2_, &#8230; _versionN_ for each version of code deployed.
 
 One way to do this is something like:
 
-<pre>mkdir /opt/test.com/$version
-svn export -q svn://${svn_host}/trunk ${site_dir}/${version}</pre>
+{{< highlight bash >}}mkdir /opt/test.com/$version
+svn export -q svn://${svn_host}/trunk ${site_dir}/${version}{{< /highlight >}}
 
 ### Informing Apache of the Document Root
 

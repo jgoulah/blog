@@ -16,12 +16,12 @@ This is just a quick tip on how to hack gitosis to allow you to have better subj
 
 So grab gitosis
 
-<pre>git clone git://eagain.net/gitosis
-</pre>
+{{< highlight bash >}}git clone git://eagain.net/gitosis
+{{< /highlight >}}
 
 Apply this patch to set an environment variable for the user that is doing a push
 
-<pre>diff --git a/gitosis/serve.py b/gitosis/serve.py
+{{< highlight bash >}}diff --git a/gitosis/serve.py b/gitosis/serve.py
 index d83b1d8..a6a49a2 100644
 --- a/gitosis/serve.py
 +++ b/gitosis/serve.py
@@ -33,16 +33,16 @@ index d83b1d8..a6a49a2 100644
          os.execvp('git', ['git', 'shell', '-c', newcmd])
          main_log.error('Cannot execute git-shell.')
          sys.exit(1)
-</pre>
+{{< /highlight >}}
 
 Then install gitosis with that change
 
-<pre>$ sudo ./setup.py install
-</pre>
+{{< highlight bash >}}$ sudo ./setup.py install
+{{< /highlight >}}
 
 Now, edit the _/usr/local/bin/git-post-receive-email_ script to change the subject line to make more sense
 
-<pre>--- /usr/local/bin/git-post-receive-email.old	2010-02-06 19:29:35.000000000 +0000
+{{< highlight bash >}}--- /usr/local/bin/git-post-receive-email.old	2010-02-06 19:29:35.000000000 +0000
 +++ /usr/local/bin/git-post-receive-email	2010-02-06 19:14:03.000000000 +0000
 @@ -186,7 +186,7 @@
  	# Generate header
@@ -53,12 +53,12 @@ Now, edit the _/usr/local/bin/git-post-receive-email_ script to change the subje
  	X-Git-Refname: $refname
  	X-Git-Reftype: $refname_type
  	X-Git-Oldrev: $oldrev
-</pre>
+{{< /highlight >}}
 
 If you haven't setup email already make sure that you have the hook installed by making a symbolic link in _/home/git/repositories/myrepo.git/hooks_
 
-<pre>ln -s /usr/local/bin/git-post-receive-email post-receive
-</pre>
+{{< highlight bash >}}ln -s /usr/local/bin/git-post-receive-email post-receive
+{{< /highlight >}}
 
 And now your subject changes from this
 

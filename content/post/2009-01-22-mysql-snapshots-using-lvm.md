@@ -18,12 +18,12 @@ LVM snapshots are a quick and easy way to take a backup of your MySQL server&#82
 
 Figure out the partition you want to put the LVM on, in our case we&#8217;ll use /data2
 
-<pre>$ df -h | grep data2
-/dev/sda2             371G  195M  352G   1% /data2</pre>
+{{< highlight bash >}}$ df -h | grep data2
+/dev/sda2             371G  195M  352G   1% /data2{{< /highlight >}}
 
 We&#8217;ll need to run fdisk on it.  If you have data on here, save it to somewhere else!
 
-<pre>$ sudo fdisk /dev/sda2
+{{< highlight bash >}}$ sudo fdisk /dev/sda2
 Device contains neither a valid DOS partition table, nor Sun, SGI or OSF disklabel
 Building a new DOS disklabel. Changes will remain in memory only,
 until you decide to write them. After that, of course, the previous
@@ -51,30 +51,30 @@ Using default value 49932
 Command (m for help): t
 Selected partition 1
 Hex code (type L to list codes): 8e
-Changed system type of partition 1 to 8e (Linux LVM)</pre>
+Changed system type of partition 1 to 8e (Linux LVM){{< /highlight >}}
 
 You can review the change with the &#8216;p&#8217; command:
 
-<pre>Command (m for help): p
+{{< highlight bash >}}Command (m for help): p
 
 Disk /dev/sda2: 410.7 GB, 410704680960 bytes
 255 heads, 63 sectors/track, 49932 cylinders
 Units = cylinders of 16065 * 512 = 8225280 bytes
 
      Device Boot      Start         End      Blocks   Id  System
-/dev/sda2p1               1       49932   401078758+  8e  Linux LVM</pre>
+/dev/sda2p1               1       49932   401078758+  8e  Linux LVM{{< /highlight >}}
 
 You might need to reboot here, so go ahead and run sudo shutdown -r now
 
 Now unmount the disk we want to create the lvm on and create a physical volume
 
-<pre>$ sudo umount /dev/sda2
+{{< highlight bash >}}$ sudo umount /dev/sda2
 $ sudo pvcreate /dev/sda2
-Physical volume "/dev/sda2" successfully created</pre>
+Physical volume "/dev/sda2" successfully created{{< /highlight >}}
 
 You can see our new physical volume with pvdisplay
 
-<pre>$ sudo pvdisplay
+{{< highlight bash >}}$ sudo pvdisplay
   "/dev/sda2" is a new physical volume of "382.50 GB"
   --- NEW Physical volume ---
   PV Name               /dev/sda2
@@ -85,16 +85,16 @@ You can see our new physical volume with pvdisplay
   Total PE              0
   Free PE               0
   Allocated PE          0
-  PV UUID               myxfgQ-alfA-y8sX-af4a-ifoA-3S29-YD3tuK</pre>
+  PV UUID               myxfgQ-alfA-y8sX-af4a-ifoA-3S29-YD3tuK{{< /highlight >}}
 
 Now create a volume group on the physical volume, since we&#8217;re using this for mysql we&#8217;ll call it mysql
 
-<pre>$ sudo vgcreate mysql /dev/sda2
-  Volume group "mysql" successfully created</pre>
+{{< highlight bash >}}$ sudo vgcreate mysql /dev/sda2
+  Volume group "mysql" successfully created{{< /highlight >}}
 
 And you can view it
 
-<pre>$ sudo vgdisplay
+{{< highlight bash >}}$ sudo vgdisplay
   --- Volume group ---
   VG Name               mysql
   System ID
@@ -114,16 +114,16 @@ And you can view it
   Total PE              97919
   Alloc PE / Size       0 / 0
   Free  PE / Size       97919 / 382.50 GB
-  VG UUID               0VZxkR-873N-E6Vj-H6SV-FCWO-3jHF-ykHRiX</pre>
+  VG UUID               0VZxkR-873N-E6Vj-H6SV-FCWO-3jHF-ykHRiX{{< /highlight >}}
 
 Create a logical volume on the volume group, we&#8217;ll put it on our mysql volume group and call it maindb. We want it to be about half (or less) of the entire amount of space we have to make a backup, in this case thats about half of 382GB so we&#8217;ll go with 190:
 
-<pre>$ sudo lvcreate --name maindb --size 190G mysql
-  Logical volume "maindb" created</pre>
+{{< highlight bash >}}$ sudo lvcreate --name maindb --size 190G mysql
+  Logical volume "maindb" created{{< /highlight >}}
 
 And you can view it:
 
-<pre>$ sudo lvdisplay
+{{< highlight bash >}}$ sudo lvdisplay
   --- Logical volume ---
   LV Name                /dev/mysql/maindb
   VG Name                mysql
@@ -137,11 +137,11 @@ And you can view it:
   Allocation             inherit
   Read ahead sectors     auto
   - currently set to     256
-  Block device           253:0</pre>
+  Block device           253:0{{< /highlight >}}
 
 Now we have to put an actual filesystem on it:
 
-<pre>$ sudo mkfs.ext3 /dev/mysql/maindb
+{{< highlight bash >}}$ sudo mkfs.ext3 /dev/mysql/maindb
 mke2fs 1.39 (29-May-2006)
 Filesystem label=
 OS type: Linux
@@ -163,16 +163,16 @@ Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done
 
 This filesystem will be automatically checked every 26 mounts or
-180 days, whichever comes first.  Use tune2fs -c or -i to override.</pre>
+180 days, whichever comes first.  Use tune2fs -c or -i to override.{{< /highlight >}}
 
 And now we can actually re mount it on the /data2 folder:
 
-<pre>$ sudo mount /dev/mysql/maindb /data2</pre>
+{{< highlight bash >}}$ sudo mount /dev/mysql/maindb /data2{{< /highlight >}}
 
 And add it to fstab, making sure to comment out the old entry
 
-<pre>#LABEL=/data2            /data2                  ext3    defaults        1 2
-/dev/mysql/maindb       /data2                  ext3       rw,noatime   0 0</pre>
+{{< highlight bash >}}#LABEL=/data2            /data2                  ext3    defaults        1 2
+/dev/mysql/maindb       /data2                  ext3       rw,noatime   0 0{{< /highlight >}}
 
 Note that we do not have to create the other logical volume on the volume group that is used for the snapshot, as the lvmbackup tool will take care of it for us.
 
@@ -180,12 +180,12 @@ Note that we do not have to create the other logical volume on the volume group 
 
 Now we want to move our mysql installation into this folder:
 
-<pre>$ sudo mkdir -p /data2/var/lib
-$ sudo mv /var/lib/mysql/ /data2/var/lib/</pre>
+{{< highlight bash >}}$ sudo mkdir -p /data2/var/lib
+$ sudo mv /var/lib/mysql/ /data2/var/lib/{{< /highlight >}}
 
 We need to ensure the my.cnf has settings pointing to this new directory:
 
-<pre>[mysqld]
+{{< highlight bash >}}[mysqld]
 datadir=/data2/var/lib/mysql
 socket=/data2/var/lib/mysql/mysql.sock
 log-bin = /data2/var/lib/mysql/bin.log
@@ -195,29 +195,29 @@ user=mysql
 basedir=/data2/var/lib
 
 [client]
-socket=/data2/var/lib/mysql/mysql.sock</pre>
+socket=/data2/var/lib/mysql/mysql.sock{{< /highlight >}}
 
 We can keep the log and pid outside of the LVM if we want:
 
-<pre>[mysqld_safe]
+{{< highlight bash >}}[mysqld_safe]
 log-error=/var/log/mysqld.log
-pid-file=/var/run/mysqld/mysqld.pid</pre>
+pid-file=/var/run/mysqld/mysqld.pid{{< /highlight >}}
 
 Now you can start mysqld:
 
-<pre>sudo /usr/bin/mysqld_safe &</pre>
+{{< highlight bash >}}sudo /usr/bin/mysqld_safe &{{< /highlight >}}
 
 # Install mylvmbackup
 
 Grab the latest mylvmbackup utility:
 
-<pre>$ wget http://www.lenzg.org/mylvmbackup/mylvmbackup-current.tar.gz</pre>
+{{< highlight bash >}}$ wget http://www.lenzg.org/mylvmbackup/mylvmbackup-current.tar.gz{{< /highlight >}}
 
 Extract and install, its just a script so there is no compilation necessary:
 
-<pre>$ tar xzvf mylvmbackup-0.11.tar.gz
+{{< highlight bash >}}$ tar xzvf mylvmbackup-0.11.tar.gz
 $ cd mylvmbackup-0.11
-$ sudo make install</pre>
+$ sudo make install{{< /highlight >}}
 
 You&#8217;ll also need some perl modules:
 
@@ -235,7 +235,7 @@ Now we need to setup the config file for mylvmbackup, located at /etc/mylvmbacku
 
 There are lots of options but at the very least we need to set:
 
-<pre>[mysql]
+{{< highlight bash >}}[mysql]
 user=root
 password={your root pass here}
 
@@ -252,23 +252,23 @@ innodb_recover=1
 [tools]
 lvcreate=/usr/sbin/lvcreate
 lvremove=/usr/sbin/lvremove
-lvs=/usr/sbin/lvs</pre>
+lvs=/usr/sbin/lvs{{< /highlight >}}
 
 You may also want to change the backupdir parameter, as this is where the tarball of your database backup is stored,  so you&#8217;ll need the space for that.
 
 You&#8217;ll want to make sure this backup directory exists, so if you are using the default:
 
-<pre>$ sudo mkdir -p /var/tmp/mylvmbackup/backup</pre>
+{{< highlight bash >}}$ sudo mkdir -p /var/tmp/mylvmbackup/backup{{< /highlight >}}
 
 And also the mount directory (this is where the LVM snapshot is mounted so a mysqldump can be taken:
 
-<pre>$ sudo mkdir -p /var/tmp/mylvmbackup/mnt</pre>
+{{< highlight bash >}}$ sudo mkdir -p /var/tmp/mylvmbackup/mnt{{< /highlight >}}
 
 # Create the Backup
 
 Now you can simply run the mylvmbackup command as root.   Heres what the output looks like:
 
-<pre>$ sudo mylvmbackup
+{{< highlight bash >}}$ sudo mylvmbackup
 20090122 13:26:47 Info: Connecting to database...
 20090122 13:26:47 Info: Flushing tables with read lock...
 20090122 13:26:47 Info: Taking position record...
@@ -389,9 +389,9 @@ backup-pos/backup-20090122_132647_mysql_my.cnf
 20090122 13:26:48 Info: LVM Usage stats:
 20090122 13:26:48 Info:LV VG Attr LSize Origin Snap% Move Log Copy% Convert
 20090122 13:26:48 Info:   maindb_snapshot mysql swi-a- 190.00G maindb   0.00
-  Logical volume "maindb_snapshot" successfully removed</pre>
+  Logical volume "maindb_snapshot" successfully removed{{< /highlight >}}
 
 And now you should have a tarball in your backup directory, with all the files needed to restore:
 
-<pre>$ ls /var/tmp/mylvmbackup/backup
-backup-20090122_132647_mysql.tar.gz</pre>
+{{< highlight bash >}}$ ls /var/tmp/mylvmbackup/backup
+backup-20090122_132647_mysql.tar.gz{{< /highlight >}}

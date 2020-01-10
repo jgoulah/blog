@@ -8,6 +8,7 @@ baseURL = "https://blog.johngoulah.com/"
 #  homeTitle = "Beautiful Hugo Theme" # Set a different text for the header on the home page
   subtitle = "hacking / management / systems"
   rss = true
+  logo = "img/jg-crop1.png" # Expecting square dimensions
 
 [Author]
   name = "John Goulah"
@@ -40,6 +41,18 @@ baseURL = "https://blog.johngoulah.com/"
     weight = 3
 
 [[menu.main]]
+    identifier = "all"
+    name = "More"
+    weight = 4
+
+[[menu.main]]
+    parent = "all"
+    name = "Posts"
+    url = "post"
+    weight = 2
+
+[[menu.main]]
+    parent = "all"
     name = "Tags"
     url = "tags"
-    weight = 3
+    weight = 2

@@ -1,8 +1,22 @@
 languageCode = "en-us"
-title = "John Goulah blog"
+title = "John Goulah"
 theme = "beautifulhugo"
 #theme = "ananke"
-baseURL = "https://example.org/"
+baseURL = "https://blog.johngoulah.com/"
+
+[Params]
+#  homeTitle = "Beautiful Hugo Theme" # Set a different text for the header on the home page
+  subtitle = "hacking / management / systems"
+  rss = true
+
+[Author]
+  name = "John Goulah"
+  website = "blog.johngoulah.com"
+  #email = "youremail@domain.com"
+  github = "jgoulah"
+  twitter = "johngoulah"
+  linkedin = "goulah"
+  #slack = "jgoulah"
 
 [markup]
   [markup.highlight]
@@ -14,3 +28,18 @@ baseURL = "https://example.org/"
     noClasses = true
     style = "monokai"
     tabWidth = 4
+
+[[menu.main]]
+    name = "Blog"
+    url = ""
+    weight = 1
+
+[[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 3
+
+[[menu.main]]
+    name = "Tags"
+    url = "tags"
+    weight = 3

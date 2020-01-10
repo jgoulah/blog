@@ -54,7 +54,7 @@ First go ahead and grab the version from github that includes Objective-C suppor
 
 Compile and install in the usual way. Now you can utilize it to generate yourself a tags file. Mine looks like this:
 
-[gist id=1421612]
+{{< gist jgoulah 1421612 >}}
 
 Just a little explanation here, I&#8217;m going into my working directory and generating a tags file for both MyApp and ios\_frameworks. ios\_frameworks is just a symlink that points to _/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks_
 

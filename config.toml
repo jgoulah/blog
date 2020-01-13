@@ -4,6 +4,7 @@ theme = "beautifulhugo"
 #theme = "ananke"
 baseURL = ""
 relativeURLs = true
+googleAnalytics = "UA-7020489-1"
 
 [Params]
 #  homeTitle = "Beautiful Hugo Theme" # Set a different text for the header on the home page

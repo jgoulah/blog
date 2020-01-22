@@ -3,7 +3,7 @@ title = "John Goulah"
 theme = "beautifulhugo"
 #theme = "ananke"
 baseURL = ""
-relativeURLs = true
+relativeURLs = false
 googleAnalytics = "UA-7020489-1"
 
 [Params]

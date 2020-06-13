@@ -33,8 +33,13 @@ googleAnalytics = "UA-7020489-1"
     tabWidth = 4
 
 [[menu.main]]
-    name = "Blog"
-    url = ""
+    name = "Tech"
+    url = "post/tech"
+    weight = 1
+
+[[menu.main]]
+    name = "Mgmt"
+    url = "post/mgmt"
     weight = 1
 
 [[menu.main]]

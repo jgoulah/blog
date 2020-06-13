@@ -1,7 +1,7 @@
 ---
 title: "Hello (again)"
 date: 2020-01-16T11:55:21-05:00
-draft: false 
+draft: true 
 ---
 
 One of my resolutions for the year is to try to write more. It's been too long since I've written something down and actually published it. Not to make excuses but somewhere along the way raising twins and taking on a new CTO job absorbed all of my writing energy, and even if I didn't always realize it I was ending my days in a state of exhaustion. One of the number one things I've tried to protect the folks on my teams from is burnout, and I may have been headed down that path myself. I most recently worked the last four years as a startup CTO and have a lot of interesting experiences to draw from and write about. A lot of topics that I used to publish had been "how to" style articles on technical topics that I've found interesting. I'm still hoping to write some of those, and I'm also going to try to publish some of the things that I learned and encountered as a startup CTO.

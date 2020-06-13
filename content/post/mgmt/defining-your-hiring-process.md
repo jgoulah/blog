@@ -1,7 +1,7 @@
 ---
 title: "Defining Your Hiring Process"
-date: 2020-02-11T13:56:22-05:00
-draft: true
+date: 2020-06-12T13:56:22-05:00
+draft: false 
 ---
 
 You've got the foundation for your startup built, and pretty soon you're going
@@ -16,7 +16,7 @@ sourcing candidates
 First things first you need candidates to talk to! So how do you find people to
 talk to? The best candidates are going to come from your own network, otherwise
 you're going to dive into the magic art of candidate sourcing. The very
-easiest way to source is to find and use recruiters. Going a recruiter you can trust that
+easiest way to source is to find and use recruiters. Going with a recruiter you can trust that
 you find through friends in your network is probably the best approach.
 Recruiters generally charge about 20-25% of the candidates starting salary. Some
 will be volume oriented (sending you tons of resumes/candidates to review) and others will
@@ -108,6 +108,11 @@ candidate but leaves some room for flexibility. If the candidate verbally
 accepts, congratulations, you can finally write up the offer formally and have
 both parties sign it.
 
+conclusion
+==========
+These are just some of the things that you'll have to be thinking about as you
+define your hiring process. I'll dive into some of these in more depth in future
+articles.
 
 
 
